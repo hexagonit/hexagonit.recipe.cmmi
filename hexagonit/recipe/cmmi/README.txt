@@ -193,13 +193,14 @@ global ``buildout`` dictionary.
 
 Let's create a simple python script to demonstrate the
 functionality. You can naturally have separate scripts for each hook
-or simply use just one or two hooks, here we just use a single module.
+or simply use just one or two hooks. Here we use just a single module.
 
     >>> hooks = tmpdir('hooks')
     >>> write(hooks, 'customhandlers.py',
     ... """
     ... import logging
     ... log = logging.getLogger('hook')
+    ...
     ... def preconfigure(options, buildout):
     ...     log.info('This is pre-configure-hook!')
     ...     
