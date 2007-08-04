@@ -5,6 +5,7 @@ import logging
 import urllib
 import shutil
 import md5
+import imp
 import os
 
 import hexagonit.recipe.download
@@ -27,6 +28,17 @@ class Recipe:
 
     def update(self):
         pass
+
+    def call_script(self, script):
+        """This method is copied from z3c.recipe.runscript.
+
+        See http://pypi.python.org/pypi/z3c.recipe.runscript for details.
+        """
+        filename, callable = script.split(':')
+        filename = os.path.abspath(filename)
+        module = imp.load_source('script', filename)
+        # Run the script with all options
+        getattr(module, callable.strip())(self.options, self.buildout)
 
     def run(self, cmd):
         log = logging.getLogger(self.name)
@@ -75,9 +87,22 @@ class Recipe:
                 for patch in patches:
                     self.run('%s %s < %s' % (patch_cmd, patch_options, patch))
 
+            if 'pre-configure-hook' in self.options:
+                log.info('Executing pre-configure-hook')
+                self.call_script(self.options['pre-configure-hook'])
+
             self.run('./configure --prefix=%s %s' % (self.options['prefix'], configure_options))
+
+            if 'pre-make-hook' in self.options:
+                log.info('Executing pre-make-hook')
+                self.call_script(self.options['pre-make-hook'])
+
             self.run(make_cmd)
             self.run('%s %s' % (make_cmd, make_targets))
+
+            if 'post-make-hook' in self.options:
+                log.info('Executing post-make-hook')
+                self.call_script(self.options['post-make-hook'])
 
         except:
             log.error('Compilation error. The package is left as is at %s where '

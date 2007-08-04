@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.0.0'
+version = '1.0.0'
 name = 'hexagonit.recipe.cmmi'
 
 def read(*rnames):
@@ -9,7 +9,7 @@ def read(*rnames):
 
 setup(name=name,
       version=version,
-      description="zc.buildout recipe for ...",
+      description="zc.buildout recipe for compiling and installing source distributions.",
       long_description= (
         read('README.txt')
         + '\n' +

@@ -44,6 +44,28 @@ patches
     List of patch files to the applied to the extracted source. Each
     file should be given on a separate line.
 
+pre-configure-hook
+    Custom python script that will be executed before running the
+    ``configure`` script. The format of the options is::
+
+        /path/to/the/module.py:name_of_callable
+
+    where the first part is a filesystem path to the python module and
+    the second part is the name of the callable in the module that
+    will be called. The callable will be passed two parameters: the
+    ``options`` dictionary from the recipe and the global ``buildout``
+    dictionary. The callable is not expected to return anything.
+
+pre-make-hook
+    Custom python script that will be executed before running
+    ``make``. The format and semantics are the same as with the
+    ``pre-configure-hook`` option.
+
+post-make-hook
+    Custom python script that will be executed after running
+    ``make``. The format and semantics are the same as with the
+    ``pre-configure-hook`` option.
+
 keep-compile-dir
     Switch to optionally keep the temporary directory where the
     package was compiled. This is mostly useful for other recipes that
@@ -72,6 +94,7 @@ We'll use a simple tarball to demonstrate the recipe.
     >>> import os.path
     >>> src = join(os.path.dirname(__file__), 'testdata')
     >>> ls(src)
+    d .svn
     - package-0.0.0.tar.gz
 
 The package contains a dummy ``configure`` script that will simply
@@ -147,9 +170,79 @@ targets and also patches the source code before the scripts are run.
     installing patched package
     installing patched package-lib
 
+Sometimes even the above is not enough and you need to be able to
+control the process in even more detail. One such use case would be to
+perform dynamic substitutions on the source code (possible based on
+information from the buildout) which cannot be done with static
+patches or to simply run arbitrary commands.
 
-For more specific needs you can write your own recipe that uses
+The recipe allows you to write custom python scripts that hook into
+the build process. You can define a script to be run:
+
+ - before the configure script is executed (pre-configure-hook)
+ - before the make process is executed (pre-make-hook)
+ - after the make process is finished (post-make-hook)
+
+Each option needs to contain the following information
+
+  /full/path/to/the/python/module.py:name_of_callable
+
+where the callable object (here name_of_callable) is expected to take
+two parameters, the ``options`` dictionary from the recipe and the
+global ``buildout`` dictionary.
+
+Let's create a simple python script to demonstrate the
+functionality. You can naturally have separate scripts for each hook
+or simply use just one or two hooks, here we just use a single module.
+
+    >>> hooks = tmpdir('hooks')
+    >>> write(hooks, 'customhandlers.py',
+    ... """
+    ... import logging
+    ... log = logging.getLogger('hook')
+    ... def preconfigure(options, buildout):
+    ...     log.info('This is pre-configure-hook!')
+    ...     
+    ... def premake(options, buildout):
+    ...     log.info('This is pre-make-hook!')
+    ...     
+    ... def postmake(options, buildout):
+    ...     log.info('This is post-make-hook!')
+    ...     
+    ... """)
+
+and a new buildout to try it out
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = package
+    ...
+    ... [package]
+    ... recipe = hexagonit.recipe.cmmi
+    ... url = file://%(src)s/package-0.0.0.tar.gz
+    ... pre-configure-hook = %(module)s:preconfigure
+    ... pre-make-hook = %(module)s:premake
+    ... post-make-hook = %(module)s:postmake
+    ... """ % dict(src=src, module='%s/customhandlers.py' % hooks))
+
+    >>> print system(buildout)
+    Uninstalling package.
+    Installing package.
+    package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
+    package: Extracting package to /tmp/...
+    package: Executing pre-configure-hook
+    hook: This is pre-configure-hook!
+    configure --prefix=/sample_buildout/parts/package
+    package: Executing pre-make-hook
+    hook: This is pre-make-hook!
+    building package
+    installing package
+    package: Executing post-make-hook
+    hook: This is post-make-hook!
+
+For even more specific needs you can write your own recipe that uses
 ``hexagonit.recipe.cmmi`` and set the ``keep-compile-dir`` option to
 ``true``. You can then continue from where this recipe finished by
 reading the location of the compile directory from
-``options['compile-directory']``.
+``options['compile-directory']`` from your own recipe.
