@@ -127,6 +127,10 @@ default build options.
 As we can see the configure script was called with the ``--prefix``
 option by default followed by calls to ``make`` and ``make install``.
 
+
+Advanced configuration
+======================
+
 The above options are enough to build most packages. However, in some
 cases it is not enough and we need to control the build process
 more. Let's try again with a new buildout and provide more options.
@@ -169,6 +173,10 @@ targets and also patches the source code before the scripts are run.
     building patched package
     installing patched package
     installing patched package-lib
+
+
+Customizing the build process
+=============================
 
 Sometimes even the above is not enough and you need to be able to
 control the process in even more detail. One such use case would be to
