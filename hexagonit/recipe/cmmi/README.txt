@@ -119,7 +119,7 @@ default build options.
     >>> print system(buildout)
     Installing package.
     package: Creating download directory: /sample_buildout/downloads
-    package: Extracting package to /tmp/...package
+    package: Extracting package to /sample_buildout/parts/package__compile__
     configure --prefix=/sample_buildout/parts/package
     building package
     installing package
@@ -165,7 +165,7 @@ targets and also patches the source code before the scripts are run.
     Installing package.
     package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
     package: MD5 checksum OK
-    package: Extracting package to /tmp/...
+    package: Extracting package to /sample_buildout/parts/package__compile__
     package: Applying patches
     patching file configure
     patching file Makefile.dist
@@ -239,7 +239,7 @@ and a new buildout to try it out
     Uninstalling package.
     Installing package.
     package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
-    package: Extracting package to /tmp/...
+    package: Extracting package to /sample_buildout/parts/package__compile__
     package: Executing pre-configure-hook
     hook: This is pre-configure-hook!
     configure --prefix=/sample_buildout/parts/package
@@ -255,3 +255,4 @@ For even more specific needs you can write your own recipe that uses
 ``true``. You can then continue from where this recipe finished by
 reading the location of the compile directory from
 ``options['compile-directory']`` from your own recipe.
+

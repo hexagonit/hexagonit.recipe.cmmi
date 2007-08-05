@@ -25,6 +25,7 @@ class Recipe:
             self.name)
         options['prefix'] = options['location']
         options['url'] = options['url']
+        options['compile-directory'] = '%s__compile__' % options['location']
 
     def update(self):
         pass
@@ -48,6 +49,7 @@ class Recipe:
 
     def install(self):
         log = logging.getLogger(self.name)
+        parts = []
 
         make_cmd = self.options.get('make-binary', 'make').strip()
         make_targets = ' '.join(self.options.get('make-targets', 'install').split())
@@ -58,7 +60,8 @@ class Recipe:
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
         patches = self.options.get('patches', '').split()
 
-        compile_dir = tempfile.mkdtemp(self.name)
+        compile_dir = self.options['compile-directory']
+        os.mkdir(compile_dir)
         
         # Download the source using hexagonit.recipe.download
         try:
@@ -110,8 +113,13 @@ class Recipe:
             raise
 
         if self.options.get('keep-compile-dir', '').lower() in ('true', 'yes', '1', 'on'):
-            self.options['compile-dir'] = os.getcwd()
+            # If we're keeping the compile directory around, add it to
+            # the parts so that it's also removed when this recipe is
+            # uninstalled.
+            parts.append(self.options['compile-directory'])
         else:
             shutil.rmtree(compile_dir)
+            del self.options['compile-directory']
 
-        return [self.options['location']]
+        parts.append(self.options['location'])
+        return parts

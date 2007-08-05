@@ -1,6 +1,13 @@
 Change History
 **************
 
+1.0.1
+=====
+
+ - Fixed a bug with 'keep-compile-dir' option. The location of the
+   compilation directory was not available through the
+   ``options['compile-directory']`` option as documented.
+
 1.0.0
 =====
 
