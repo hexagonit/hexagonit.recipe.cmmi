@@ -5,7 +5,14 @@ url
     URL to the package that will be downloaded and extracted. The
     supported package formats are .tar.gz, .tar.bz2, and .zip. The
     value must be a full URL,
-    e.g. http://python.org/ftp/python/2.4.4/Python-2.4.4.tgz.
+    e.g. http://python.org/ftp/python/2.4.4/Python-2.4.4.tgz. The
+    ``path`` option can not be used at the same time with ``url``.
+
+path
+    Path to a local directory containing the source code to be built
+    and installed. The directory must contain the ``configure``
+    script. The ``url`` option can not be used at the same time with
+    ``path``.
 
 md5sum
     MD5 checksum for the package file. If available the MD5
