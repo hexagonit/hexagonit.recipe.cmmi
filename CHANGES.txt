@@ -1,6 +1,13 @@
 Change History
 **************
 
+1.1.0
+=====
+
+ - Added new option ``path`` to allow building and installing local
+   source trees. The ``path`` option is mutually exclusive with
+   ``url``.
+
 1.0.1
 =====
 
@@ -11,4 +18,4 @@ Change History
 1.0.0
 =====
 
-Initial public release.
+ - Initial public release.

@@ -26,6 +26,7 @@ def test_suite():
                          '--prefix=/sample_buildout'),
                         (re.compile('\s/\S+sample-buildout'),
                          ' /sample_buildout'),
+                        zc.buildout.testing.normalize_path,
                         ]),
                 ),
             ))

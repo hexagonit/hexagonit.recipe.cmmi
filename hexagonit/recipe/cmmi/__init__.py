@@ -24,8 +24,18 @@ class Recipe:
             buildout['buildout']['parts-directory'],
             self.name)
         options['prefix'] = options['location']
-        options['url'] = options['url']
-        options['compile-directory'] = '%s__compile__' % options['location']
+        options['url'] = options.get('url', '').strip()
+        options['path'] = options.get('path', '').strip()
+
+        if options['url'] and options['path']:
+            raise zc.buildout.UserError('You must use either "url" or "path", not both!')
+        if not (options['url'] or options['path']):
+            raise zc.buildout.UserError('You must provide either "url" or "path".')
+
+        if options['url']:
+            options['compile-directory'] = '%s__compile__' % options['location']
+        else:
+            options['compile-directory'] = options['path']
 
     def update(self):
         pass
@@ -60,18 +70,22 @@ class Recipe:
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
         patches = self.options.get('patches', '').split()
 
-        compile_dir = self.options['compile-directory']
-        os.mkdir(compile_dir)
-        
         # Download the source using hexagonit.recipe.download
-        try:
-            opt = self.options.copy()
-            opt['destination'] = compile_dir
-            hexagonit.recipe.download.Recipe(
-                self.buildout, self.name, opt).install()
-        except:
-            shutil.rmtree(compile_dir)
-            raise
+        if self.options['url']:
+            compile_dir = self.options['compile-directory']
+            os.mkdir(compile_dir)
+        
+            try:
+                opt = self.options.copy()
+                opt['destination'] = compile_dir
+                hexagonit.recipe.download.Recipe(
+                    self.buildout, self.name, opt).install()
+            except:
+                shutil.rmtree(compile_dir)
+                raise
+        else:
+            log.info('Using local source directory: %s' % self.options['path'])
+            compile_dir = self.options['path']
 
         os.mkdir(self.options['location'])
         os.chdir(compile_dir)
@@ -112,14 +126,15 @@ class Recipe:
                       'you can inspect what went wrong' % os.getcwd())
             raise
 
-        if self.options.get('keep-compile-dir', '').lower() in ('true', 'yes', '1', 'on'):
-            # If we're keeping the compile directory around, add it to
-            # the parts so that it's also removed when this recipe is
-            # uninstalled.
-            parts.append(self.options['compile-directory'])
-        else:
-            shutil.rmtree(compile_dir)
-            del self.options['compile-directory']
+        if self.options['url']:
+            if self.options.get('keep-compile-dir', '').lower() in ('true', 'yes', '1', 'on'):
+                # If we're keeping the compile directory around, add it to
+                # the parts so that it's also removed when this recipe is
+                # uninstalled.
+                parts.append(self.options['compile-directory'])
+            else:
+                shutil.rmtree(compile_dir)
+                del self.options['compile-directory']
 
         parts.append(self.options['location'])
         return parts

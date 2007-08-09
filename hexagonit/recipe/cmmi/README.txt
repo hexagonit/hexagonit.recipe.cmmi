@@ -128,6 +128,53 @@ As we can see the configure script was called with the ``--prefix``
 option by default followed by calls to ``make`` and ``make install``.
 
 
+Installing checkouts
+====================
+
+Sometimes instead of downloading and building an existing tarball we
+need to work with code that is already available on the filesystem,
+for example an SVN checkout.
+
+Instead of providing the ``url`` option we will provide a ``path``
+option to the directory containing the source code.
+
+Let's demonstrate this by first unpacking our test package to the
+filesystem and building that.
+
+    >>> checkout_dir = tmpdir('checkout')
+    >>> import setuptools.archive_util
+    >>> setuptools.archive_util.unpack_archive('%s/package-0.0.0.tar.gz' % src,
+    ...                                        checkout_dir)
+    >>> ls(checkout_dir)
+    d package-0.0.0
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = package
+    ...
+    ... [package]
+    ... recipe = hexagonit.recipe.cmmi
+    ... path = %s/package-0.0.0
+    ... """ % checkout_dir)
+
+    >>> print system(buildout)
+    Uninstalling package.
+    Installing package.
+    package: Using local source directory: /checkout/package-0.0.0
+    configure --prefix=/sample_buildout/parts/package
+    building package
+    installing package
+
+Since using the ``path`` implies that the source code has been
+acquired outside of the control of the recipe also the responsibility
+of managing it is outside of the recipe.
+
+Depending on the software you may need to manually run ``make clean``
+etc. between buildout runs if you make changes to the code. Also, the
+``keep-compile-dir`` has no effect when ``path`` is used.
+
+
 Advanced configuration
 ======================
 
