@@ -1,6 +1,13 @@
 Change History
 **************
 
+1.1.1
+=====
+
+  - Don't try to execute hooks if the option is an empty string. This
+    will make it possible to disable hooks when extending existing
+    parts.
+
 1.1.0
 =====
 

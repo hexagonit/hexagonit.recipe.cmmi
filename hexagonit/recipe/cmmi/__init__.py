@@ -104,20 +104,20 @@ class Recipe:
                 for patch in patches:
                     self.run('%s %s < %s' % (patch_cmd, patch_options, patch))
 
-            if 'pre-configure-hook' in self.options:
+            if 'pre-configure-hook' in self.options and len(self.options['pre-configure-hook'].strip()) > 0:
                 log.info('Executing pre-configure-hook')
                 self.call_script(self.options['pre-configure-hook'])
 
             self.run('./configure --prefix=%s %s' % (self.options['prefix'], configure_options))
 
-            if 'pre-make-hook' in self.options:
+            if 'pre-make-hook' in self.options and len(self.options['pre-make-hook'].strip()) > 0:
                 log.info('Executing pre-make-hook')
                 self.call_script(self.options['pre-make-hook'])
 
             self.run(make_cmd)
             self.run('%s %s' % (make_cmd, make_targets))
 
-            if 'post-make-hook' in self.options:
+            if 'post-make-hook' in self.options and len(self.options['post-make-hook'].strip()) > 0:
                 log.info('Executing post-make-hook')
                 self.call_script(self.options['post-make-hook'])
 
