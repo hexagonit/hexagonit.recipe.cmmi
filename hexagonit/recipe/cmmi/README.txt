@@ -82,15 +82,15 @@ keep-compile-dir
     Accepted values are 'true' or 'false', defaults to 'false'.
 
 
-Additionally, the recipe honors the ``download-directory`` option set
+Additionally, the recipe honors the ``download-cache`` option set
 in the ``[buildout]`` section and stores the downloaded files under
 it. If the value is not set a directory called ``downloads`` will be
-created in the root of the buildout and the ``download-directory``
+created in the root of the buildout and the ``download-cache``
 option set accordingly.
 
 The recipe will first check if there is a local copy of the package
 before downloading it from the net. Files can be shared among
-different buildouts by setting the ``download-directory`` to the same
+different buildouts by setting the ``download-cache`` to the same
 location.
 
 Example usage
