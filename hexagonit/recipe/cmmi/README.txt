@@ -101,7 +101,6 @@ We'll use a simple tarball to demonstrate the recipe.
     >>> import os.path
     >>> src = join(os.path.dirname(__file__), 'testdata')
     >>> ls(src)
-    d .svn
     - package-0.0.0.tar.gz
 
 The package contains a dummy ``configure`` script that will simply
