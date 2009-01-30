@@ -9,4 +9,4 @@ distributions using ``configure`` and ``make``. It is inspired by the
 zc.recipe.cmmi_ recipe but provides more control over the build
 process.
 
-.. _zc.recipe.cmmi : http://cheeseshop.python.org/pypi/zc.recipe.cmmi
+.. _zc.recipe.cmmi : http://pypi.python.org/pypi/zc.recipe.cmmi
