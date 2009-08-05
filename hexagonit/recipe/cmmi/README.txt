@@ -145,7 +145,7 @@ Installing a Perl package
 =========================
 
 The recipe can be used to install packages that use a slightly different build
-process. Perl packages often come with a ``Makefile.PL`` scripts that performs
+process. Perl packages often come with a ``Makefile.PL`` script that performs
 the same task as a ``configure`` script and generates a ``Makefile``.
 
 We can build and install such a package by overriding the ``configure-command``
