@@ -31,6 +31,13 @@ make-targets
     need to use this if you want to build alternate targets. Each
     target must be given on a separate line.
 
+configure-command
+    Name of the configure command that will be run to generate the Makefile.
+    This defaults to ``./configure`` which is fine for packages that come with
+    a configure script. You may wish to change this when compiling packages
+    with a different set up. See the ``Compiling a Perl package`` section for
+    an example.
+
 configure-options
     Extra options to be given to the ``configure`` script. By default
     only the ``--prefix`` option is passed which is set to the part
@@ -101,6 +108,7 @@ We'll use a simple tarball to demonstrate the recipe.
     >>> import os.path
     >>> src = join(os.path.dirname(__file__), 'testdata')
     >>> ls(src)
+    - Foo-Bar-0.0.0.tar.gz
     - package-0.0.0.tar.gz
 
 The package contains a dummy ``configure`` script that will simply
@@ -133,6 +141,35 @@ default build options.
 As we can see the configure script was called with the ``--prefix``
 option by default followed by calls to ``make`` and ``make install``.
 
+Installing a Perl package
+=========================
+
+The recipe can be used to install packages that use a slightly different build
+process. Perl packages often come with a ``Makefile.PL`` scripts that performs
+the same task as a ``configure`` script and generates a ``Makefile``.
+
+We can build and install such a package by overriding the ``configure-command``
+option. The following example builds a Foo::Bar perl module and installs it in
+a custom location within the buildout::
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... parts = foobar
+    ... perl_lib = ${buildout:directory}/perl_lib
+    ...
+    ... [foobar]
+    ... recipe = hexagonit.recipe.cmmi
+    ... configure-command = perl -I${buildout:perl_lib}/lib/perl5 Makefile.PL INSTALL_BASE=${buildout:perl_lib}
+    ... url = file://%s/Foo-Bar-0.0.0.tar.gz
+    ... """ % src)
+    
+    >>> print system(buildout)
+    Uninstalling package.
+    Installing foobar.
+    foobar: Extracting package to /sample_buildout/parts/foobar__compile__
+    building package
+    installing package
 
 Installing checkouts
 ====================
@@ -165,7 +202,7 @@ filesystem and building that.
     ... """ % checkout_dir)
 
     >>> print system(buildout)
-    Uninstalling package.
+    Uninstalling foobar.
     Installing package.
     package: Using local source directory: /checkout/package-0.0.0
     configure --prefix=/sample_buildout/parts/package

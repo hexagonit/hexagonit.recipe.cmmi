@@ -1,14 +1,9 @@
-import zc.buildout
-import urlparse
-import tempfile
-import logging
-import urllib
-import shutil
-import md5
-import imp
-import os
-
 import hexagonit.recipe.download
+import imp
+import logging
+import os
+import shutil
+import zc.buildout
 
 class Recipe:
     """zc.buildout recipe for compiling and installing software"""
@@ -64,7 +59,12 @@ class Recipe:
         make_cmd = self.options.get('make-binary', 'make').strip()
         make_targets = ' '.join(self.options.get('make-targets', 'install').split())
 
-        configure_options = ' '.join(self.options.get('configure-options','').split())
+        configure_cmd = self.options.get('configure-command', './configure')
+        configure_options = self.options.get('configure-options','').split()
+
+        # Add the prefix only if we're using a configure script
+        if 'configure' in configure_cmd:
+            configure_options.insert(0, '--prefix=%s' % self.options['prefix'])
 
         patch_cmd = self.options.get('patch-binary', 'patch').strip()
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
@@ -90,14 +90,20 @@ class Recipe:
         os.mkdir(self.options['location'])
         os.chdir(compile_dir)
         
+        def is_build_dir():
+            return os.path.isfile('configure') or os.path.isfile('Makefile.PL')
+        
         try:
-            if not os.path.isfile('configure'):
+            if not is_build_dir():
                 contents = os.listdir(compile_dir)
                 if len(contents) == 1:
                     os.chdir(contents[0])
-                    if not os.path.isfile('configure'):
+                    if not is_build_dir():
                         log.error('Unable to find the configure script')
                         raise zc.buildout.UserError('Invalid package contents')
+                else:
+                    log.error('Unable to find the configure script')
+                    raise zc.buildout.UserError('Invalid package contents')
             
             if patches:
                 log.info('Applying patches')
@@ -108,7 +114,7 @@ class Recipe:
                 log.info('Executing pre-configure-hook')
                 self.call_script(self.options['pre-configure-hook'])
 
-            self.run('./configure --prefix=%s %s' % (self.options['prefix'], configure_options))
+            self.run('%s %s' % (configure_cmd, ' '.join(configure_options)))
 
             if 'pre-make-hook' in self.options and len(self.options['pre-make-hook'].strip()) > 0:
                 log.info('Executing pre-make-hook')

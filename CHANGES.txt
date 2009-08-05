@@ -1,6 +1,14 @@
 Change History
 **************
 
+1.2.0
+=====
+
+  - Added new ``configure-command`` option to control the command used to
+    generate the ``Makefile``. This makes it possible to build slightly
+    different packages, e.g. Perl projects where Makefile.PL replaces the
+    configure script.
+
 1.1.1
 =====
 
