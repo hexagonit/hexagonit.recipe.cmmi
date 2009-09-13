@@ -5,7 +5,7 @@ import os
 import shutil
 import zc.buildout
 
-class Recipe:
+class Recipe(object):
     """zc.buildout recipe for compiling and installing software"""
 
     def __init__(self, buildout, name, options):
@@ -18,7 +18,7 @@ class Recipe:
         options['location'] = os.path.join(
             buildout['buildout']['parts-directory'],
             self.name)
-        options['prefix'] = options['location']
+        options['prefix'] = options.get('prefix', options['location'])
         options['url'] = options.get('url', '').strip()
         options['path'] = options.get('path', '').strip()
 
@@ -31,6 +31,21 @@ class Recipe:
             options['compile-directory'] = '%s__compile__' % options['location']
         else:
             options['compile-directory'] = options['path']
+        
+        self.environ = {}
+        environment_section = self.options.get('environment-section', '').strip()
+        if environment_section and environment_section in buildout:
+            # Use environment variables from the designated config section.
+            self.environ.update(buildout[environment_section])
+        for variable in self.options.get('environment', '').splitlines():
+            if variable.strip():
+                try:
+                    key, value = variable.split('=', 1)
+                    self.environ[key.strip()] = value
+                except ValueError:
+                    raise zc.buildout.UserError('Invalid environment variable definition: %s', variable)
+        for key in self.environ:
+            self.environ[key] = self.environ[key] % os.environ
 
     def update(self):
         pass
@@ -69,6 +84,11 @@ class Recipe:
         patch_cmd = self.options.get('patch-binary', 'patch').strip()
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
         patches = self.options.get('patches', '').split()
+        
+        if self.environ:
+            for key, value in self.environ.items():
+                log.info('[ENV] %s = %s', key, value)
+            os.environ.update(self.environ)
 
         # Download the source using hexagonit.recipe.download
         if self.options['url']:

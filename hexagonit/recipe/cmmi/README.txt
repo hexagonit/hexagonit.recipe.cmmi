@@ -1,64 +1,65 @@
 Supported options
 =================
 
-url
+``url``
     URL to the package that will be downloaded and extracted. The
     supported package formats are .tar.gz, .tar.bz2, and .zip. The
     value must be a full URL,
     e.g. http://python.org/ftp/python/2.4.4/Python-2.4.4.tgz. The
     ``path`` option can not be used at the same time with ``url``.
 
-path
+``path``
     Path to a local directory containing the source code to be built
     and installed. The directory must contain the ``configure``
     script. The ``url`` option can not be used at the same time with
     ``path``.
 
-md5sum
+``prefix``
+    Custom installation prefix passed to the ``--prefix`` option of the
+    ``configure`` script. Defaults to the location of the part.
+
+``md5sum``
     MD5 checksum for the package file. If available the MD5
     checksum of the downloaded package will be compared to this value
     and if the values do not match the execution of the recipe will
     fail.
 
-make-binary
+``make-binary``
     Path to the ``make`` program. Defaults to 'make' which
     should work on any system that has the ``make`` program available
     in the system ``PATH``.
 
-make-targets
+``make-targets``
     Targets for the ``make`` command. Defaults to 'install'
     which will be enough to install most software packages. You only
     need to use this if you want to build alternate targets. Each
     target must be given on a separate line.
 
-configure-command
+``configure-command``
     Name of the configure command that will be run to generate the Makefile.
     This defaults to ``./configure`` which is fine for packages that come with
     a configure script. You may wish to change this when compiling packages
     with a different set up. See the ``Compiling a Perl package`` section for
     an example.
 
-configure-options
+``configure-options``
     Extra options to be given to the ``configure`` script. By default
     only the ``--prefix`` option is passed which is set to the part
-    directory. Each option must be given on a separate line. Note that
-    in addition to configure options you can also pass in environment
-    variables such as ``CFLAGS`` and ``LDFLAGS`` to control the build
-    process.
+    directory. Each option must be given on a separate line.
 
-patch-binary
+``patch-binary``
     Path to the ``patch`` program. Defaults to 'patch' which should
     work on any system that has the ``patch`` program available in the
     system ``PATH``.
 
-patch-options
+``patch-options``
     Options passed to the ``patch`` program. Defaults to ``-p0``.
 
-patches
+``patches``
     List of patch files to the applied to the extracted source. Each
     file should be given on a separate line.
 
-pre-configure-hook
+``pre-configure-hook``
     Custom python script that will be executed before running the
     ``configure`` script. The format of the options is::
 
@@ -70,17 +71,17 @@ pre-configure-hook
     ``options`` dictionary from the recipe and the global ``buildout``
     dictionary. The callable is not expected to return anything.
 
-pre-make-hook
+``pre-make-hook``
     Custom python script that will be executed before running
     ``make``. The format and semantics are the same as with the
     ``pre-configure-hook`` option.
 
-post-make-hook
+``post-make-hook``
     Custom python script that will be executed after running
     ``make``. The format and semantics are the same as with the
     ``pre-configure-hook`` option.
 
-keep-compile-dir
+``keep-compile-dir``
     Switch to optionally keep the temporary directory where the
     package was compiled. This is mostly useful for other recipes that
     use this recipe to compile a software but wish to do some
@@ -88,6 +89,33 @@ keep-compile-dir
     compile directory is stored in ``options['compile-directory']``.
     Accepted values are 'true' or 'false', defaults to 'false'.
 
+``environment-section``
+
+    Name of a section that provides environment variables that will be used to
+    update ``os.environ`` before executing the recipe.
+    
+    The values of the environment variables may contain references to other
+    existing environment variables (including themselves) in the form of
+    Python string interpolation variables using the dictionary notation. These
+    references will be expanded before ``os.environ`` is updated. This can be
+    used, for example, to append to the ``PATH`` variable, e.g.::
+        
+        [component]
+        recipe = hexagonit.recipe.cmmi
+        environment = environment
+        
+        [environment]
+        PATH = %(PATH)s:${buildout:directory}/bin
+
+``environment``
+
+  A sequence of ``KEY=VALUE`` pairs separated by newlines that define
+  additional environment variables used to update ``os.environ`` before
+  executing the recipe.
+  
+  The semantics of this option are the same as ``environment-section``. If
+  both ``environment-section`` and ``environment`` are provided the values from
+  the former will be overridden by the latter allowing per-part customization.
 
 Additionally, the recipe honors the ``download-cache`` option set
 in the ``[buildout]`` section and stores the downloaded files under
@@ -234,11 +262,13 @@ more. Let's try again with a new buildout and provide more options.
     ... recipe = hexagonit.recipe.cmmi
     ... url = file://%(src)s/package-0.0.0.tar.gz
     ... md5sum = 6b94295c042a91ea3203857326bc9209
+    ... prefix = /somewhere/else
+    ... environment =
+    ...     CFLAGS=-I/sw/include
+    ...     LDFLAGS=-L/sw/lib
     ... configure-options =
     ...     --with-threads
     ...     --without-foobar
-    ...     CFLAGS=-I/sw/include
-    ...     LDFLAGS=-L/sw/lib
     ... make-targets =
     ...     install
     ...     install-lib
@@ -247,19 +277,22 @@ more. Let's try again with a new buildout and provide more options.
     ...     patches/Makefile.dist.patch
     ... """ % dict(src=src))
 
-This configuration uses custom configure options, multiple make
-targets and also patches the source code before the scripts are run.
+This configuration uses custom configure options, custom environment, custom
+prefix, multiple make targets and also patches the source code before the
+scripts are run.
 
     >>> print system(buildout)
     Uninstalling package.
     Installing package.
+    package: [ENV] LDFLAGS = -L/sw/lib
+    package: [ENV] CFLAGS = -I/sw/include
     package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
     package: MD5 checksum OK
     package: Extracting package to /sample_buildout/parts/package__compile__
     package: Applying patches
     patching file configure
     patching file Makefile.dist
-    patched-configure --prefix=/sample_buildout/parts/package --with-threads --without-foobar CFLAGS=-I/sw/include LDFLAGS=-L/sw/lib
+    patched-configure --prefix=/somewhere/else --with-threads --without-foobar
     building patched package
     installing patched package
     installing patched package-lib

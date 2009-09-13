@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.2.0'
+version = '1.3.0'
 name = 'hexagonit.recipe.cmmi'
 
 def read(*rnames):
@@ -33,7 +33,7 @@ setup(name=name,
       keywords='development buildout recipe',
       author='Kai Lautaportti',
       author_email='kai.lautaportti@hexagonit.fi',
-      url='http://cheeseshop.python.org/pypi/%s' % name,
+      url='http://github.com/hexagonit/hexagonit.recipe.cmmi',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['hexagonit', 'hexagonit.recipe'],

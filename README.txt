@@ -9,4 +9,8 @@ distributions using ``configure`` and ``make``. It is inspired by the
 zc.recipe.cmmi_ recipe but provides more control over the build
 process.
 
+Repository: http://github.com/hexagonit/hexagonit.recipe.cmmi
+
+Clone URL: git clone git://github.com/hexagonit/hexagonit.recipe.cmmi.git
+
 .. _zc.recipe.cmmi : http://pypi.python.org/pypi/zc.recipe.cmmi
