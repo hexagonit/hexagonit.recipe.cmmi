@@ -102,7 +102,7 @@ Supported options
         
         [component]
         recipe = hexagonit.recipe.cmmi
-        environment = environment
+        environment-section = environment
         
         [environment]
         PATH = %(PATH)s:${buildout:directory}/bin
@@ -258,14 +258,18 @@ more. Let's try again with a new buildout and provide more options.
     ... [buildout]
     ... parts = package
     ...
+    ... [build-environment]
+    ... CFLAGS = -I/sw/include
+    ... LDFLAGS = -I/sw/lib
+    ...
     ... [package]
     ... recipe = hexagonit.recipe.cmmi
     ... url = file://%(src)s/package-0.0.0.tar.gz
     ... md5sum = 6b94295c042a91ea3203857326bc9209
     ... prefix = /somewhere/else
+    ... environment-section = build-environment
     ... environment =
-    ...     CFLAGS=-I/sw/include
-    ...     LDFLAGS=-L/sw/lib
+    ...     LDFLAGS=-L/sw/lib -L/some/extra/lib
     ... configure-options =
     ...     --with-threads
     ...     --without-foobar
@@ -277,14 +281,15 @@ more. Let's try again with a new buildout and provide more options.
     ...     patches/Makefile.dist.patch
     ... """ % dict(src=src))
 
-This configuration uses custom configure options, custom environment, custom
-prefix, multiple make targets and also patches the source code before the
+This configuration uses custom configure options, an environment
+section, per-part customization to the environment, custom prefix,
+multiple make targets and also patches the source code before the
 scripts are run.
 
     >>> print system(buildout)
     Uninstalling package.
     Installing package.
-    package: [ENV] LDFLAGS = -L/sw/lib
+    package: [ENV] LDFLAGS = -L/sw/lib -L/some/extra/lib
     package: [ENV] CFLAGS = -I/sw/include
     package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
     package: MD5 checksum OK
