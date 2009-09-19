@@ -160,7 +160,6 @@ default build options.
 
     >>> print system(buildout)
     Installing package.
-    package: Creating download directory: /sample_buildout/downloads
     package: Extracting package to /sample_buildout/parts/package__compile__
     configure --prefix=/sample_buildout/parts/package
     building package
@@ -289,10 +288,8 @@ scripts are run.
     >>> print system(buildout)
     Uninstalling package.
     Installing package.
-    package: [ENV] LDFLAGS = -L/sw/lib -L/some/extra/lib
     package: [ENV] CFLAGS = -I/sw/include
-    package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
-    package: MD5 checksum OK
+    package: [ENV] LDFLAGS = -L/sw/lib -L/some/extra/lib
     package: Extracting package to /sample_buildout/parts/package__compile__
     package: Applying patches
     patching file configure
@@ -366,7 +363,6 @@ and a new buildout to try it out
     >>> print system(buildout)
     Uninstalling package.
     Installing package.
-    package: Using a cached copy from /sample_buildout/downloads/package-0.0.0.tar.gz
     package: Extracting package to /sample_buildout/parts/package__compile__
     package: Executing pre-configure-hook
     hook: This is pre-configure-hook!

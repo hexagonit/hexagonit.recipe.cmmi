@@ -86,8 +86,8 @@ class Recipe(object):
         patches = self.options.get('patches', '').split()
         
         if self.environ:
-            for key, value in self.environ.items():
-                log.info('[ENV] %s = %s', key, value)
+            for key in sorted(self.environ.keys()):
+                log.info('[ENV] %s = %s', key, self.environ[key])
             os.environ.update(self.environ)
 
         # Download the source using hexagonit.recipe.download
