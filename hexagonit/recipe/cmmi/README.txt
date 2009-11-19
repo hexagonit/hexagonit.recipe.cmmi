@@ -148,6 +148,7 @@ Let's create a buildout to build and install the package.
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
+    ... newest = false
     ... parts = package
     ...
     ... [package]
@@ -182,6 +183,7 @@ a custom location within the buildout::
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
+    ... newest = false
     ... parts = foobar
     ... perl_lib = ${buildout:directory}/perl_lib
     ...
@@ -221,6 +223,7 @@ filesystem and building that.
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
+    ... newest = false
     ... parts = package
     ...
     ... [package]
@@ -255,6 +258,7 @@ more. Let's try again with a new buildout and provide more options.
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
+    ... newest = false
     ... parts = package
     ...
     ... [build-environment]
@@ -350,6 +354,7 @@ and a new buildout to try it out
     >>> write('buildout.cfg',
     ... """
     ... [buildout]
+    ... newest = false
     ... parts = package
     ...
     ... [package]
