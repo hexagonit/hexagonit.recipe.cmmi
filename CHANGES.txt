@@ -1,6 +1,17 @@
 Change History
 **************
 
+1.3.1 (xxxx-xx-xx)
+==================
+
+ - Refactored the ``is_build_dir()`` helper method to make it easier to test
+   and override in customized recipes. [dokai]
+
+ - Fixed the handling of the working directory so that it is restored to the
+   state before executing the recipe regardless whether the recipe was
+   successful or not. Thanks to Jonathan Ballet for the report and preliminary
+   patch. [dokai]
+
 1.3.0 (2009-09-20)
 ==================
 
