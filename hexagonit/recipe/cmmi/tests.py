@@ -6,6 +6,7 @@ import re
 import shutil
 import tempfile
 import unittest
+import zc.buildout
 import zc.buildout.testing
 import zc.buildout.tests
 
@@ -21,7 +22,7 @@ def setUp(test):
 class NonInformativeTests(unittest.TestCase):
 
     def setUp(self):
-        self.dir = tempfile.mkdtemp()
+        self.dir = os.path.realpath(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self.dir)
@@ -35,9 +36,11 @@ class NonInformativeTests(unittest.TestCase):
 
     def make_recipe(self, buildout, name, options):
         from hexagonit.recipe.cmmi import Recipe
+        parts_directory_path = os.path.join(self.dir, 'test_parts')
+        os.mkdir(parts_directory_path)
         bo = {
             'buildout' : {
-                'parts-directory' : '',
+                'parts-directory' : parts_directory_path,
             }
         }
         bo.update(buildout)
@@ -60,6 +63,24 @@ class NonInformativeTests(unittest.TestCase):
 
         self.failUnless(os.path.exists(makefile))
         self.failUnless(recipe.is_build_dir())
+
+    def test_working_directory_restored_after_failure(self):
+        compile_directory = os.path.join(self.dir, 'compile_directory')
+        os.makedirs(compile_directory)
+        recipe = self.make_recipe({}, 'test', {'path' : compile_directory})
+        os.chdir(self.dir)
+
+        self.assertRaises(zc.buildout.UserError, recipe.install)
+        self.assertEquals(self.dir, os.getcwd())
+
+    def test_working_directory_restored_after_success(self):
+        compile_directory = os.path.join(self.dir, 'compile_directory')
+        os.makedirs(compile_directory)
+        self.write_file(os.path.join(compile_directory, 'configure'), 'Dummy configure')
+        
+        recipe = self.make_recipe({}, 'test', {'path' : compile_directory})
+        os.chdir(self.dir)
+        self.assertEquals(self.dir, os.getcwd())
 
 
 def test_suite():

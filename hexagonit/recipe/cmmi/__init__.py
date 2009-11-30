@@ -112,47 +112,51 @@ class Recipe(object):
             log.info('Using local source directory: %s' % self.options['path'])
             compile_dir = self.options['path']
 
+        current_dir = os.getcwd()
         os.mkdir(self.options['location'])
         os.chdir(compile_dir)
 
         try:
-            if not self.is_build_dir():
-                contents = os.listdir(compile_dir)
-                if len(contents) == 1:
-                    os.chdir(contents[0])
-                    if not self.is_build_dir():
+            try:
+                if not self.is_build_dir():
+                    contents = os.listdir(compile_dir)
+                    if len(contents) == 1:
+                        os.chdir(contents[0])
+                        if not self.is_build_dir():
+                            log.error('Unable to find the configure script')
+                            raise zc.buildout.UserError('Invalid package contents')
+                    else:
                         log.error('Unable to find the configure script')
                         raise zc.buildout.UserError('Invalid package contents')
-                else:
-                    log.error('Unable to find the configure script')
-                    raise zc.buildout.UserError('Invalid package contents')
 
-            if patches:
-                log.info('Applying patches')
-                for patch in patches:
-                    self.run('%s %s < %s' % (patch_cmd, patch_options, patch))
+                if patches:
+                    log.info('Applying patches')
+                    for patch in patches:
+                        self.run('%s %s < %s' % (patch_cmd, patch_options, patch))
 
-            if 'pre-configure-hook' in self.options and len(self.options['pre-configure-hook'].strip()) > 0:
-                log.info('Executing pre-configure-hook')
-                self.call_script(self.options['pre-configure-hook'])
+                if 'pre-configure-hook' in self.options and len(self.options['pre-configure-hook'].strip()) > 0:
+                    log.info('Executing pre-configure-hook')
+                    self.call_script(self.options['pre-configure-hook'])
 
-            self.run('%s %s' % (configure_cmd, ' '.join(configure_options)))
+                self.run('%s %s' % (configure_cmd, ' '.join(configure_options)))
 
-            if 'pre-make-hook' in self.options and len(self.options['pre-make-hook'].strip()) > 0:
-                log.info('Executing pre-make-hook')
-                self.call_script(self.options['pre-make-hook'])
+                if 'pre-make-hook' in self.options and len(self.options['pre-make-hook'].strip()) > 0:
+                    log.info('Executing pre-make-hook')
+                    self.call_script(self.options['pre-make-hook'])
 
-            self.run(make_cmd)
-            self.run('%s %s' % (make_cmd, make_targets))
+                self.run(make_cmd)
+                self.run('%s %s' % (make_cmd, make_targets))
 
-            if 'post-make-hook' in self.options and len(self.options['post-make-hook'].strip()) > 0:
-                log.info('Executing post-make-hook')
-                self.call_script(self.options['post-make-hook'])
+                if 'post-make-hook' in self.options and len(self.options['post-make-hook'].strip()) > 0:
+                    log.info('Executing post-make-hook')
+                    self.call_script(self.options['post-make-hook'])
 
-        except:
-            log.error('Compilation error. The package is left as is at %s where '
-                      'you can inspect what went wrong' % os.getcwd())
-            raise
+            except:
+                log.error('Compilation error. The package is left as is at %s where '
+                          'you can inspect what went wrong' % os.getcwd())
+                raise
+        finally:
+            os.chdir(current_dir)
 
         if self.options['url']:
             if self.options.get('keep-compile-dir', '').lower() in ('true', 'yes', '1', 'on'):
