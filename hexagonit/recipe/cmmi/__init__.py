@@ -67,6 +67,11 @@ class Recipe(object):
             log.error('Error executing command: %s' % cmd)
             raise zc.buildout.UserError('System error')
 
+    def is_build_dir(self):
+        """Returns True if the current directory contains files that we
+        consider buildable, False otherwise."""
+        return os.path.isfile('configure') or os.path.isfile('Makefile.PL')
+
     def install(self):
         log = logging.getLogger(self.name)
         parts = []
@@ -94,7 +99,7 @@ class Recipe(object):
         if self.options['url']:
             compile_dir = self.options['compile-directory']
             os.mkdir(compile_dir)
-        
+
             try:
                 opt = self.options.copy()
                 opt['destination'] = compile_dir
@@ -109,22 +114,19 @@ class Recipe(object):
 
         os.mkdir(self.options['location'])
         os.chdir(compile_dir)
-        
-        def is_build_dir():
-            return os.path.isfile('configure') or os.path.isfile('Makefile.PL')
-        
+
         try:
-            if not is_build_dir():
+            if not self.is_build_dir():
                 contents = os.listdir(compile_dir)
                 if len(contents) == 1:
                     os.chdir(contents[0])
-                    if not is_build_dir():
+                    if not self.is_build_dir():
                         log.error('Unable to find the configure script')
                         raise zc.buildout.UserError('Invalid package contents')
                 else:
                     log.error('Unable to find the configure script')
                     raise zc.buildout.UserError('Invalid package contents')
-            
+
             if patches:
                 log.info('Applying patches')
                 for patch in patches:
