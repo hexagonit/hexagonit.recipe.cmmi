@@ -1,4 +1,5 @@
 import hexagonit.recipe.download
+import errno
 import imp
 import logging
 import os
@@ -98,7 +99,13 @@ class Recipe(object):
         # Download the source using hexagonit.recipe.download
         if self.options['url']:
             compile_dir = self.options['compile-directory']
-            os.mkdir(compile_dir)
+            try:
+                os.mkdir(compile_dir)
+            except OSError, e:
+                # leftovers from a previous failed attempt,
+                # download recipe will raise a clean error message
+                if e.errno != errno.EEXIST:
+                    raise
 
             try:
                 opt = self.options.copy()
