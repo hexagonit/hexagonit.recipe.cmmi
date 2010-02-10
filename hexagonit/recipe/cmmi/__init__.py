@@ -32,7 +32,7 @@ class Recipe(object):
             options['compile-directory'] = '%s__compile__' % options['location']
         else:
             options['compile-directory'] = options['path']
-        
+
         self.environ = {}
         environment_section = self.options.get('environment-section', '').strip()
         if environment_section and environment_section in buildout:
@@ -90,7 +90,7 @@ class Recipe(object):
         patch_cmd = self.options.get('patch-binary', 'patch').strip()
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
         patches = self.options.get('patches', '').split()
-        
+
         if self.environ:
             for key in sorted(self.environ.keys()):
                 log.info('[ENV] %s = %s', key, self.environ[key])
