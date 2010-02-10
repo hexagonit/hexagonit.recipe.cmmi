@@ -120,7 +120,11 @@ class Recipe(object):
             compile_dir = self.options['path']
 
         current_dir = os.getcwd()
-        os.mkdir(self.options['location'])
+        try:
+            os.mkdir(self.options['location'])
+        except OSError, e:
+            if e.errno == errno.EEXIST:
+                pass
         os.chdir(compile_dir)
 
         try:
