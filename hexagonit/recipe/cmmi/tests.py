@@ -5,6 +5,7 @@ import errno
 import os
 import re
 import shutil
+import tarfile
 import tempfile
 import unittest
 import zc.buildout
@@ -102,6 +103,42 @@ class NonInformativeTests(unittest.TestCase):
         # of the bad URL, and _not_ some OSError because test__compile__
         # already exists
         self.assertRaises(IOError, recipe.install)
+
+    def test_restart_after_failure(self):
+        temp_directory = tempfile.mkdtemp(dir=self.dir, prefix="fake_package")
+
+        configure_path = os.path.join(temp_directory, 'configure')
+        self.write_file(configure_path, 'exit 0')
+        makefile_path = os.path.join(temp_directory, 'Makefile')
+        self.write_file(makefile_path, 'exit -1')
+
+        os.chdir(temp_directory)
+
+        ignore, tarfile_path = tempfile.mkstemp(suffix=".tar")
+        tar = tarfile.open(tarfile_path, 'w')
+        tar.add('configure')
+        tar.add('Makefile')
+        tar.close()
+
+        recipe = self.make_recipe({}, 'test', {'url' : tarfile_path})
+        os.chdir(self.dir)
+
+        try:
+            # expected failure
+            self.assertRaises(zc.buildout.UserError, recipe.install)
+
+            # User deletes the __compile__ path
+            build_directory = os.path.join(self.dir, 'test_parts/test__compile__')
+            shutil.rmtree(build_directory)
+
+            # the install should still fail, and _not_ raise an OSError
+            self.assertRaises(zc.buildout.UserError, recipe.install)
+        finally:
+            try:
+                shutil.rmtree(temp_directory)
+                os.remove(tarfile_path)
+            except:
+                pass
 
 def test_suite():
     suite = unittest.TestSuite((
