@@ -1,6 +1,7 @@
 from zope.testing import doctest
 from zope.testing import renormalizing
 
+import errno
 import os
 import re
 import shutil
@@ -37,10 +38,15 @@ class NonInformativeTests(unittest.TestCase):
     def make_recipe(self, buildout, name, options):
         from hexagonit.recipe.cmmi import Recipe
         parts_directory_path = os.path.join(self.dir, 'test_parts')
-        os.mkdir(parts_directory_path)
+        try:
+            os.mkdir(parts_directory_path)
+        except OSError, e:
+            if e.errno != errno.EEXIST:
+                raise
         bo = {
             'buildout' : {
                 'parts-directory' : parts_directory_path,
+                'directory' : self.dir,
             }
         }
         bo.update(buildout)
@@ -82,6 +88,20 @@ class NonInformativeTests(unittest.TestCase):
         os.chdir(self.dir)
         self.assertEquals(self.dir, os.getcwd())
 
+    def test_compile_directory_exists(self):
+        """
+        Do not fail if the compile-directory already exists
+        """
+        compile_directory = os.path.join(self.dir, 'test_parts/test__compile__')
+        os.makedirs(compile_directory)
+
+        recipe = self.make_recipe({}, 'test', dict(url="some invalid url"))
+        os.chdir(self.dir)
+
+        # if compile directory exists, recipe should raise an IOError because
+        # of the bad URL, and _not_ some OSError because test__compile__
+        # already exists
+        self.assertRaises(IOError, recipe.install)
 
 def test_suite():
     suite = unittest.TestSuite((
