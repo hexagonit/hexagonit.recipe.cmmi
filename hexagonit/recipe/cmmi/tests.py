@@ -5,6 +5,7 @@ import errno
 import os
 import re
 import shutil
+import stat
 import tarfile
 import tempfile
 import unittest
@@ -29,11 +30,12 @@ class NonInformativeTests(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir)
 
-    def write_file(self, filename, contents):
+    def write_file(self, filename, contents, mode=stat.S_IREAD|stat.S_IWUSR):
         path = os.path.join(self.dir, filename)
         fh = open(path, 'w')
         fh.write(contents)
         fh.close()
+        os.chmod(path, mode)
         return path
 
     def make_recipe(self, buildout, name, options):
@@ -108,9 +110,9 @@ class NonInformativeTests(unittest.TestCase):
         temp_directory = tempfile.mkdtemp(dir=self.dir, prefix="fake_package")
 
         configure_path = os.path.join(temp_directory, 'configure')
-        self.write_file(configure_path, 'exit 0')
+        self.write_file(configure_path, 'exit 0', mode=stat.S_IRWXU)
         makefile_path = os.path.join(temp_directory, 'Makefile')
-        self.write_file(makefile_path, 'exit -1')
+        self.write_file(makefile_path, 'all:\n\texit -1')
 
         os.chdir(temp_directory)
 
