@@ -1,6 +1,6 @@
-from zope.testing import doctest
 from zope.testing import renormalizing
 
+import doctest
 import errno
 import os
 import re
