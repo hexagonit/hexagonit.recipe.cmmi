@@ -142,6 +142,29 @@ class NonInformativeTests(unittest.TestCase):
             except:
                 pass
 
+    def test_environment_restored_after_building_a_part(self):
+        # Make sure the test variables do not exist beforehand
+        self.failIf('HRC_FOO' in os.environ)
+        self.failIf('HRC_BAR' in os.environ)
+        # Place a sentinel value to make sure the original environment is
+        # maintained
+        os.environ['HRC_SENTINEL'] = 'sentinel'
+        self.assertEquals(os.environ.get('HRC_SENTINEL'), 'sentinel')
+
+        recipe = self.make_recipe({}, 'test', {
+            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
+            'environment' : 'HRC_FOO=bar\nHRC_BAR=foo'})
+        os.chdir(self.dir)
+        recipe.install()
+
+        # Make sure the test variables are not kept in the environment after
+        # the part has been built.
+        self.failIf('HRC_FOO' in os.environ)
+        self.failIf('HRC_BAR' in os.environ)
+        # Make sure the sentinel value is still in the environment
+        self.assertEquals(os.environ.get('HRC_SENTINEL'), 'sentinel')
+
+
 def test_suite():
     suite = unittest.TestSuite((
             doctest.DocFileSuite(

@@ -12,6 +12,10 @@ Change History
    successful or not. Thanks to Jonathan Ballet for the report and preliminary
    patch. [dokai]
 
+ - Fixed http://github.com/hexagonit/hexagonit.recipe.cmmi/issues#issue/1
+   Environment variables defined in one part will no longer leak to other
+   subsequent parts. [dokai]
+
 1.3.0 (2009-09-20)
 ==================
 

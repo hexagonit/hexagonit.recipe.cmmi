@@ -34,6 +34,8 @@ class Recipe(object):
             options['compile-directory'] = options['path']
 
         self.environ = {}
+        self.original_environment = os.environ.copy()
+
         environment_section = self.options.get('environment-section', '').strip()
         if environment_section and environment_section in buildout:
             # Use environment variables from the designated config section.
@@ -47,6 +49,14 @@ class Recipe(object):
                     raise zc.buildout.UserError('Invalid environment variable definition: %s', variable)
         for key in self.environ:
             self.environ[key] = self.environ[key] % os.environ
+
+    def restore_environment(self):
+        """Restores the original os.environ environment in case the recipe
+        made changes to it.
+        """
+        if self.environ:
+            os.environ.clear()
+            os.environ.update(self.original_environment)
 
     def update(self):
         pass
@@ -167,6 +177,7 @@ class Recipe(object):
                           'you can inspect what went wrong' % os.getcwd())
                 raise
         finally:
+            self.restore_environment()
             os.chdir(current_dir)
 
         if self.options['url']:
