@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.3.0'
+version = '1.3.1'
 name = 'hexagonit.recipe.cmmi'
 
 def read(*rnames):
