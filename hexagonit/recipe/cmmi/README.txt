@@ -34,6 +34,11 @@ Supported options
     should work on any system that has the ``make`` program available
     in the system ``PATH``.
 
+``make-options``
+    Extra ``KEY=VALUE`` options included in the invocation of the ``make``
+    program. Multiple options can be given on separate lines to increase
+    readability.
+
 ``make-targets``
     Targets for the ``make`` command. Defaults to 'install'
     which will be enough to install most software packages. You only
@@ -142,6 +147,7 @@ We'll use a simple tarball to demonstrate the recipe.
     >>> src = join(os.path.dirname(__file__), 'testdata')
     >>> ls(src)
     - Foo-Bar-0.0.0.tar.gz
+    - haproxy-1.4.8-dummy.tar.gz
     - package-0.0.0.tar.gz
 
 The package contains a dummy ``configure`` script that will simply
@@ -205,6 +211,46 @@ a custom location within the buildout::
     building package
     installing package
 
+Installing a package without an ``autoconf`` like system
+========================================================
+
+Some packages do not use a configuration mechanism and simply provide a
+``Makefile`` for building. It is common in these cases that the build process
+is controlled entirely by direct options to ``make``. We can build such a
+package by faking a configure command that does nothing and passing the
+appropriate options to ``make``. The ``true`` utility found in most shell
+environments is a good candidate for this although anything that returns a
+zero exit code would do.
+
+We are using a dummy "HAProxy" package as an example of a package with only a
+Makefile and using explicit ``make`` options to control the build process.
+
+    >>> write('buildout.cfg',
+    ... """
+    ... [buildout]
+    ... newest = false
+    ... parts = haproxy
+    ...
+    ... [haproxy]
+    ... recipe = hexagonit.recipe.cmmi
+    ... configure-command = true
+    ... make-options =
+    ...     TARGET=linux26
+    ...     CPU=i686
+    ...     USE_PCRE=1
+    ... url = file://%s/haproxy-1.4.8-dummy.tar.gz
+    ... """ % src)
+
+    >>> print system(buildout)
+    Uninstalling foobar.
+    Installing haproxy.
+    haproxy: Extracting package to /sample_buildout/parts/haproxy__compile__
+    Building HAProxy 1.4.8 (dummy package)
+    TARGET: linux26
+    CPU: i686
+    USE_PCRE: 1
+    Installing haproxy
+
 Installing checkouts
 ====================
 
@@ -237,7 +283,7 @@ filesystem and building that.
     ... """ % checkout_dir)
 
     >>> print system(buildout)
-    Uninstalling foobar.
+    Uninstalling haproxy.
     Installing package.
     package: Using local source directory: /checkout/package-0.0.0
     configure --prefix=/sample_buildout/parts/package

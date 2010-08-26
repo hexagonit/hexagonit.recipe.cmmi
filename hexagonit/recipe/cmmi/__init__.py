@@ -86,6 +86,7 @@ class Recipe(object):
         parts = []
 
         make_cmd = self.options.get('make-binary', 'make').strip()
+        make_options = ' '.join(self.options.get('make-options', '').split())
         make_targets = ' '.join(self.options.get('make-targets', 'install').split())
 
         configure_options = self.options.get('configure-options','').split()
@@ -162,8 +163,8 @@ class Recipe(object):
                     log.info('Executing pre-make-hook')
                     self.call_script(self.options['pre-make-hook'])
 
-                self.run(make_cmd)
-                self.run('%s %s' % (make_cmd, make_targets))
+                self.run('%s %s' % (make_cmd, make_options))
+                self.run('%s %s %s' % (make_cmd, make_options, make_targets))
 
                 if 'post-make-hook' in self.options and len(self.options['post-make-hook'].strip()) > 0:
                     log.info('Executing post-make-hook')

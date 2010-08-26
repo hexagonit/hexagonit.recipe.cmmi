@@ -4,6 +4,10 @@ Change History
 1.4.0 (xxxx-xx-xx)
 ==================
 
+  - Added support for passing options to ``make`` with the new
+    ``make-options`` option. See the "Installing a package without an
+    ``autoconf`` like system" section below for an example. [dokai]
+
   - The ``--prefix`` parameter will be automatically given to the configure
     command if and only if a) the ``configure-command`` is not used to specify
     a custom configure command and b) ``--prefix`` is not given explicitly in
