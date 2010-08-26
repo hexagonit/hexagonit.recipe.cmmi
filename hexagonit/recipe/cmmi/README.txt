@@ -16,7 +16,12 @@ Supported options
 
 ``prefix``
     Custom installation prefix passed to the ``--prefix`` option of the
-    ``configure`` script. Defaults to the location of the part.
+    ``configure`` script. Defaults to the location of the part. Note that this
+    is a convenience shortcut which assumes that the default ``configure``
+    command is used to configure the package. If the ``configure-command``
+    option is used to define a custom configure command no automatic
+    ``--prefix`` injection takes place. You can also set the ``--prefix``
+    parameter explicitly in ``configure-options``.
 
 ``md5sum``
     MD5 checksum for the package file. If available the MD5

@@ -14,8 +14,6 @@ class Recipe(object):
         self.buildout = buildout
         self.name = name
 
-        log = logging.getLogger(self.name)
-
         options['location'] = os.path.join(
             buildout['buildout']['parts-directory'],
             self.name)
@@ -90,12 +88,15 @@ class Recipe(object):
         make_cmd = self.options.get('make-binary', 'make').strip()
         make_targets = ' '.join(self.options.get('make-targets', 'install').split())
 
-        configure_cmd = self.options.get('configure-command', './configure')
         configure_options = self.options.get('configure-options','').split()
+        configure_cmd = self.options.get('configure-command', '').strip()
 
-        # Add the prefix only if we're using a configure script
-        if 'configure' in configure_cmd:
-            configure_options.insert(0, '--prefix=%s' % self.options['prefix'])
+        if not configure_cmd:
+            # Default to using basic configure script.
+            configure_cmd = './configure'
+            # Inject the --prefix parameter if not already present
+            if '--prefix' not in ' '.join(configure_options):
+                configure_options.insert(0, '--prefix=%s' % self.options['prefix'])
 
         patch_cmd = self.options.get('patch-binary', 'patch').strip()
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
@@ -139,16 +140,12 @@ class Recipe(object):
 
         try:
             try:
-                if not self.is_build_dir():
-                    contents = os.listdir(compile_dir)
-                    if len(contents) == 1:
-                        os.chdir(contents[0])
-                        if not self.is_build_dir():
-                            log.error('Unable to find the configure script')
-                            raise zc.buildout.UserError('Invalid package contents')
-                    else:
-                        log.error('Unable to find the configure script')
-                        raise zc.buildout.UserError('Invalid package contents')
+                # We support packages that either extract contents to the $PWD
+                # or alternatively have a single directory.
+                contents = os.listdir(compile_dir)
+                if len(contents) == 1 and os.path.isdir(contents[0]):
+                    # Single container
+                    os.chdir(contents[0])
 
                 if patches:
                     log.info('Applying patches')

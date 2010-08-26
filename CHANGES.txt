@@ -1,6 +1,28 @@
 Change History
 **************
 
+1.4.0 (xxxx-xx-xx)
+==================
+
+  - The ``--prefix`` parameter will be automatically given to the configure
+    command if and only if a) the ``configure-command`` is not used to specify
+    a custom configure command and b) ``--prefix`` is not given explicitly in
+    the ``configure-options`` option. [dokai]
+
+  - Removed the ``is_build_dir()`` heuristic.
+
+    Previously the recipe inspected the contents of the downloaded package to
+    determine if it contained the necessary files for building the package (it
+    checked if files named ``configure`` or ``Makefile.PL`` existed) and gave
+    an error message if they were missing. However, the recipe is useful for
+    building many different kinds of software packages and checking for
+    particular files limited its use severely.
+    
+    Now the recipe omits any checks for particular files in the downloaded
+    package. It is recommended that you use the ``md5sum`` option in your part
+    configuration to assert that you are downloading the package you expect
+    to. [dokai]
+
 1.3.1 (2010-08-23)
 ==================
 

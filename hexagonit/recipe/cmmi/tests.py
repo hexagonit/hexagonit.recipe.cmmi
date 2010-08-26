@@ -55,24 +55,6 @@ class NonInformativeTests(unittest.TestCase):
         bo.update(buildout)
         return Recipe(bo, name, options)
 
-    def test_is_build_dir__with_configure(self):
-        recipe = self.make_recipe({}, 'test', {'url' : 'http://no.where.com/'})
-        os.chdir(self.dir)
-        self.failIf(recipe.is_build_dir())
-        configure = self.write_file('configure', 'Dummy configure script')
-
-        self.failUnless(os.path.exists(configure))
-        self.failUnless(recipe.is_build_dir())
-
-    def test_is_build_dir__with_makefile_pl(self):
-        recipe = self.make_recipe({}, 'test', {'url' : 'http://no.where.com/'})
-        os.chdir(self.dir)
-        self.failIf(recipe.is_build_dir())
-        makefile = self.write_file('Makefile.PL', 'Dummy Makefile.PL script')
-
-        self.failUnless(os.path.exists(makefile))
-        self.failUnless(recipe.is_build_dir())
-
     def test_working_directory_restored_after_failure(self):
         compile_directory = os.path.join(self.dir, 'compile_directory')
         os.makedirs(compile_directory)
