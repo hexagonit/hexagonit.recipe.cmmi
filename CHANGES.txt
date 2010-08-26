@@ -9,9 +9,13 @@ Change History
     ``autoconf`` like system" section below for an example. [dokai]
 
   - The ``--prefix`` parameter will be automatically given to the configure
-    command if and only if a) the ``configure-command`` is not used to specify
-    a custom configure command and b) ``--prefix`` is not given explicitly in
-    the ``configure-options`` option. [dokai]
+    command if and only if
+
+      - the ``configure-command`` is not used to specify a custom configure command and
+
+      - ``--prefix`` is not given explicitly in the ``configure-options`` option.
+      
+    [dokai]
 
   - Removed the ``is_build_dir()`` heuristic.
 
