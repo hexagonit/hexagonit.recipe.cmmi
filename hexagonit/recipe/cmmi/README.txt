@@ -97,7 +97,7 @@ Supported options
     use this recipe to compile a software but wish to do some
     additional steps not handled by this recipe. The location of the
     compile directory is stored in ``options['compile-directory']``.
-    Accepted values are 'true' or 'false', defaults to 'false'.
+    Accepted values are ``true`` or ``false``, defaults to ``false``.
 
 ``environment-section``
 
