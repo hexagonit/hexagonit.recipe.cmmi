@@ -76,11 +76,6 @@ class Recipe(object):
             log.error('Error executing command: %s' % cmd)
             raise zc.buildout.UserError('System error')
 
-    def is_build_dir(self):
-        """Returns True if the current directory contains files that we
-        consider buildable, False otherwise."""
-        return os.path.isfile('configure') or os.path.isfile('Makefile.PL')
-
     def install(self):
         log = logging.getLogger(self.name)
         parts = []
