@@ -4,6 +4,7 @@ import imp
 import logging
 import os
 import shutil
+import subprocess
 import zc.buildout
 
 class Recipe(object):
@@ -45,16 +46,21 @@ class Recipe(object):
                     self.environ[key.strip()] = value
                 except ValueError:
                     raise zc.buildout.UserError('Invalid environment variable definition: %s', variable)
+        # Extrapolate the environment variables using values from the current
+        # environment.
         for key in self.environ:
             self.environ[key] = self.environ[key] % os.environ
 
-    def restore_environment(self):
-        """Restores the original os.environ environment in case the recipe
-        made changes to it.
+    def augmented_environment(self):
+        """Returns a dictionary containing the current environment variables
+        augmented with the part specific overrides.
+
+        The dictionary is an independent copy of ``os.environ`` and
+        modifications will not be reflected in back in ``os.environ``.
         """
-        if self.environ:
-            os.environ.clear()
-            os.environ.update(self.original_environment)
+        env = os.environ.copy()
+        env.update(self.environ)
+        return env
 
     def update(self):
         pass
@@ -71,10 +77,21 @@ class Recipe(object):
         getattr(module, callable.strip())(self.options, self.buildout)
 
     def run(self, cmd):
+        """Run the given ``cmd`` in a child process."""
         log = logging.getLogger(self.name)
-        if os.system(cmd):
-            log.error('Error executing command: %s' % cmd)
+        try:
+            retcode = subprocess.call(cmd, shell=True, env=self.augmented_environment())
+
+            if retcode < 0:
+                log.error('Command received signal %s: %s' % (-retcode, cmd))
+                raise zc.buildout.UserError('System error')
+            elif retcode > 0:
+                log.error('Command failed with exit code %s: %s' % (retcode, cmd))
+                raise zc.buildout.UserError('System error')
+        except OSError, e:
+            log.error('Command failed: %s: %s' % (e, cmd))
             raise zc.buildout.UserError('System error')
+
 
     def install(self):
         log = logging.getLogger(self.name)
@@ -101,7 +118,6 @@ class Recipe(object):
         if self.environ:
             for key in sorted(self.environ.keys()):
                 log.info('[ENV] %s = %s', key, self.environ[key])
-            os.environ.update(self.environ)
 
         # Download the source using hexagonit.recipe.download
         if self.options['url']:
@@ -170,7 +186,6 @@ class Recipe(object):
                           'you can inspect what went wrong' % os.getcwd())
                 raise
         finally:
-            self.restore_environment()
             os.chdir(current_dir)
 
         if self.options['url']:

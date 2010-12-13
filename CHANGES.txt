@@ -1,6 +1,26 @@
 Change History
 **************
 
+1.4.1 (XXXX-XX-XX)
+==================
+
+  - Refactored the environment variable handling logic. Python versions prior
+    to 2.6 have an issue clearing the environment variables using
+    ``os.environ.clear()`` (See http://bugs.python.org/issue3227). [dokai]
+
+    Instead of modifying ``os.environ`` directly we use the ``subprocess``
+    module to run the commands in child processes which are given an explicit
+    environment which is a copy of the current ``os.environ`` augmented with
+    the per-part overrides.
+    
+    See https://github.com/hexagonit/hexagonit.recipe.cmmi/issues/issue/1/#issue/1/comment/605362
+    for details.
+    
+    .. warning:: Due to this change the hook scripts no longer have the
+                 augmented environment. They can still access the buildout
+                 configuration to read the overrides but need to do this
+                 manually.
+
 1.4.0 (2010-08-27)
 ==================
 

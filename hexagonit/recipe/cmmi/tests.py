@@ -68,7 +68,7 @@ class NonInformativeTests(unittest.TestCase):
         compile_directory = os.path.join(self.dir, 'compile_directory')
         os.makedirs(compile_directory)
         self.write_file(os.path.join(compile_directory, 'configure'), 'Dummy configure')
-        
+
         recipe = self.make_recipe({}, 'test', {'path' : compile_directory})
         os.chdir(self.dir)
         self.assertEquals(self.dir, os.getcwd())
@@ -146,6 +146,10 @@ class NonInformativeTests(unittest.TestCase):
         # Make sure the sentinel value is still in the environment
         self.assertEquals(os.environ.get('HRC_SENTINEL'), 'sentinel')
 
+    def test_run__unknown_command(self):
+        recipe = self.make_recipe({}, 'test', {
+            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__)})
+        self.assertRaises(zc.buildout.UserError, lambda:recipe.run('this-command-does-not-exist'))
 
 def test_suite():
     suite = unittest.TestSuite((
