@@ -1,7 +1,7 @@
 Change History
 **************
 
-1.4.1 (XXXX-XX-XX)
+1.5.0 (XXXX-XX-XX)
 ==================
 
   - Refactored the environment variable handling logic. Python versions prior
@@ -11,15 +11,19 @@ Change History
     Instead of modifying ``os.environ`` directly we use the ``subprocess``
     module to run the commands in child processes which are given an explicit
     environment which is a copy of the current ``os.environ`` augmented with
-    the per-part overrides.
-    
+    the per-part overrides. As a result, ``os.environ`` is no longer modified
+    by this recipe.
+
+    The `Python hook scripts`_ are passed the augmented environment dictionary
+    as a third parameter.
+
+    .. warning:: Existing hook scripts accepting only two parameters
+                 continue to work but they do not have access to the modified
+                 environment variables. To fix this they should be refactored
+                 to accept the third parameter.
+
     See https://github.com/hexagonit/hexagonit.recipe.cmmi/issues/issue/1/#issue/1/comment/605362
     for details.
-    
-    .. warning:: Due to this change the hook scripts no longer have the
-                 augmented environment. They can still access the buildout
-                 configuration to read the overrides but need to do this
-                 manually.
 
 1.4.0 (2010-08-27)
 ==================
@@ -34,7 +38,7 @@ Change History
       - the ``configure-command`` is not used to specify a custom configure command and
 
       - ``--prefix`` is not given explicitly in the ``configure-options`` option.
-      
+
     [dokai]
 
   - Removed the ``is_build_dir()`` heuristic.
@@ -45,7 +49,7 @@ Change History
     an error message if they were missing. However, the recipe is useful for
     building many different kinds of software packages and checking for
     particular files limited its use severely.
-    
+
     Now the recipe omits any checks for particular files in the downloaded
     package. It is recommended that you use the ``md5sum`` option in your part
     configuration to assert that you are downloading the package you expect

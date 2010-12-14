@@ -69,17 +69,32 @@ Supported options
     List of patch files to the applied to the extracted source. Each
     file should be given on a separate line.
 
+.. _Python hook scripts:
+
 ``pre-configure-hook``
     Custom python script that will be executed before running the
     ``configure`` script. The format of the options is::
 
         /path/to/the/module.py:name_of_callable
 
-    where the first part is a filesystem path to the python module and
-    the second part is the name of the callable in the module that
-    will be called. The callable will be passed two parameters: the
-    ``options`` dictionary from the recipe and the global ``buildout``
-    dictionary. The callable is not expected to return anything.
+    where the first part is a filesystem path to the python module and the
+    second part is the name of the callable in the module that will be called.
+    The callable will be passed three parameters in the following order:
+
+        1. The ``options`` dictionary from the recipe.
+
+        2. The global ``buildout`` dictionary.
+
+        3. A dictionary containing the current ``os.environ`` augmented with
+           the part specific overrides.
+
+    The callable is not expected to return anything.
+
+    .. note:: The ``os.environ`` is not modified so if the hook script is
+              interested in the environment variable overrides defined for the
+              part it needs to read them from the dictionary that is passed in
+              as the third parameter instead of accessing ``os.environ``
+              directly.
 
 ``pre-make-hook``
     Custom python script that will be executed before running
@@ -102,18 +117,25 @@ Supported options
 ``environment-section``
 
     Name of a section that provides environment variables that will be used to
-    update ``os.environ`` before executing the recipe.
-    
+    augment the variables read from ``os.environ`` before executing the
+    recipe.
+
+    This recipe does not modify ``os.environ`` directly. External commands
+    run as part of the recipe (e.g. make, configure, etc.) get an augmented
+    environment when they are forked. Python hook scripts are passed the
+    augmented as a parameter.
+
     The values of the environment variables may contain references to other
     existing environment variables (including themselves) in the form of
     Python string interpolation variables using the dictionary notation. These
-    references will be expanded before ``os.environ`` is updated. This can be
+    references will be expanded using values from ``os.environ``. This can be
     used, for example, to append to the ``PATH`` variable, e.g.::
-        
+
         [component]
         recipe = hexagonit.recipe.cmmi
-        environment-section = environment
-        
+        environment-section =
+            environment
+
         [environment]
         PATH = %(PATH)s:${buildout:directory}/bin
 
@@ -122,7 +144,7 @@ Supported options
   A sequence of ``KEY=VALUE`` pairs separated by newlines that define
   additional environment variables used to update ``os.environ`` before
   executing the recipe.
-  
+
   The semantics of this option are the same as ``environment-section``. If
   both ``environment-section`` and ``environment`` are provided the values from
   the former will be overridden by the latter allowing per-part customization.
@@ -203,7 +225,7 @@ a custom location within the buildout::
     ... configure-command = perl -I${buildout:perl_lib}/lib/perl5 Makefile.PL INSTALL_BASE=${buildout:perl_lib}
     ... url = file://%s/Foo-Bar-0.0.0.tar.gz
     ... """ % src)
-    
+
     >>> print system(buildout)
     Uninstalling package.
     Installing foobar.
@@ -254,15 +276,15 @@ Makefile and using explicit ``make`` options to control the build process.
 Installing checkouts
 ====================
 
-Sometimes instead of downloading and building an existing tarball we
-need to work with code that is already available on the filesystem,
-for example an SVN checkout.
+Sometimes instead of downloading and building an existing tarball we need to
+work with code that is already available on the filesystem, for example an SVN
+checkout.
 
-Instead of providing the ``url`` option we will provide a ``path``
-option to the directory containing the source code.
+Instead of providing the ``url`` option we will provide a ``path`` option to
+the directory containing the source code.
 
-Let's demonstrate this by first unpacking our test package to the
-filesystem and building that.
+Let's demonstrate this by first unpacking our test package to the filesystem
+and building that.
 
     >>> checkout_dir = tmpdir('checkout')
     >>> import setuptools.archive_util
@@ -290,21 +312,21 @@ filesystem and building that.
     building package
     installing package
 
-Since using the ``path`` implies that the source code has been
-acquired outside of the control of the recipe also the responsibility
-of managing it is outside of the recipe.
+Since using the ``path`` implies that the source code has been acquired
+outside of the control of the recipe also the responsibility of managing it is
+outside of the recipe.
 
-Depending on the software you may need to manually run ``make clean``
-etc. between buildout runs if you make changes to the code. Also, the
+Depending on the software you may need to manually run ``make clean`` etc.
+between buildout runs if you make changes to the code. Also, the
 ``keep-compile-dir`` has no effect when ``path`` is used.
 
 
 Advanced configuration
 ======================
 
-The above options are enough to build most packages. However, in some
-cases it is not enough and we need to control the build process
-more. Let's try again with a new buildout and provide more options.
+The above options are enough to build most packages. However, in some cases it
+is not enough and we need to control the build process more. Let's try again
+with a new buildout and provide more options.
 
     >>> write('buildout.cfg',
     ... """
@@ -335,10 +357,9 @@ more. Let's try again with a new buildout and provide more options.
     ...     patches/Makefile.dist.patch
     ... """ % dict(src=src))
 
-This configuration uses custom configure options, an environment
-section, per-part customization to the environment, custom prefix,
-multiple make targets and also patches the source code before the
-scripts are run.
+This configuration uses custom configure options, an environment section,
+per-part customization to the environment, custom prefix, multiple make
+targets and also patches the source code before the scripts are run.
 
     >>> print system(buildout)
     Uninstalling package.
@@ -358,14 +379,14 @@ scripts are run.
 Customizing the build process
 =============================
 
-Sometimes even the above is not enough and you need to be able to
-control the process in even more detail. One such use case would be to
-perform dynamic substitutions on the source code (possible based on
-information from the buildout) which cannot be done with static
-patches or to simply run arbitrary commands.
+Sometimes even the above is not enough and you need to be able to control the
+process in even more detail. One such use case would be to perform dynamic
+substitutions on the source code (possible based on information from the
+buildout) which cannot be done with static patches or to simply run arbitrary
+commands.
 
-The recipe allows you to write custom python scripts that hook into
-the build process. You can define a script to be run:
+The recipe allows you to write custom python scripts that hook into the build
+process. You can define a script to be run:
 
  - before the configure script is executed (pre-configure-hook)
  - before the make process is executed (pre-make-hook)
@@ -375,13 +396,22 @@ Each option needs to contain the following information
 
   /full/path/to/the/python/module.py:name_of_callable
 
-where the callable object (here name_of_callable) is expected to take
-two parameters, the ``options`` dictionary from the recipe and the
-global ``buildout`` dictionary.
+where the callable object (here name_of_callable) is expected to take three
+parameters:
 
-Let's create a simple python script to demonstrate the
-functionality. You can naturally have separate scripts for each hook
-or simply use just one or two hooks. Here we use just a single module.
+    1. The ``options`` dictionary from the recipe.
+
+    2. The global ``buildout`` dictionary.
+
+    3. A dictionary containing the current ``os.environ`` augmented with
+       the part specific overrides.
+
+These parameters should provide the callable all the necessary information to
+perform any part specific customization to the build process.
+
+Let's create a simple python script to demonstrate the functionality. You can
+naturally have separate modules for each hook or simply use just one or two
+hooks. Here we use just a single module.
 
     >>> hooks = tmpdir('hooks')
     >>> write(hooks, 'customhandlers.py',
@@ -389,15 +419,15 @@ or simply use just one or two hooks. Here we use just a single module.
     ... import logging
     ... log = logging.getLogger('hook')
     ...
-    ... def preconfigure(options, buildout):
+    ... def preconfigure(options, buildout, environment):
     ...     log.info('This is pre-configure-hook!')
-    ...     
-    ... def premake(options, buildout):
+    ...
+    ... def premake(options, buildout, environment):
     ...     log.info('This is pre-make-hook!')
-    ...     
-    ... def postmake(options, buildout):
+    ...
+    ... def postmake(options, buildout, environment):
     ...     log.info('This is post-make-hook!')
-    ...     
+    ...
     ... """)
 
 and a new buildout to try it out
@@ -431,8 +461,8 @@ and a new buildout to try it out
     hook: This is post-make-hook!
 
 For even more specific needs you can write your own recipe that uses
-``hexagonit.recipe.cmmi`` and set the ``keep-compile-dir`` option to
-``true``. You can then continue from where this recipe finished by
-reading the location of the compile directory from
-``options['compile-directory']`` from your own recipe.
+``hexagonit.recipe.cmmi`` and set the ``keep-compile-dir`` option to ``true``.
+You can then continue from where this recipe finished by reading the location
+of the compile directory from ``options['compile-directory']`` from your own
+recipe.
 

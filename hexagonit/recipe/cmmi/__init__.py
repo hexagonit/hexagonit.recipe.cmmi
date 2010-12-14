@@ -73,8 +73,15 @@ class Recipe(object):
         filename, callable = script.split(':')
         filename = os.path.abspath(filename)
         module = imp.load_source('script', filename)
-        # Run the script with all options
-        getattr(module, callable.strip())(self.options, self.buildout)
+        script = getattr(module, callable.strip())
+
+        try:
+            script(self.options, self.buildout, self.augmented_environment())
+        except TypeError:
+            # BBB: Support hook scripts that do not take the environment as
+            # the third parameter
+            script(self.options, self.buildout)
+
 
     def run(self, cmd):
         """Run the given ``cmd`` in a child process."""

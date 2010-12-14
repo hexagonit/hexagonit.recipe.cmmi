@@ -29,6 +29,9 @@ class NonInformativeTests(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.dir)
+        for var in os.environ.keys():
+            if var.startswith('HRC_'):
+                del os.environ[var]
 
     def write_file(self, filename, contents, mode=stat.S_IREAD|stat.S_IWUSR):
         path = os.path.join(self.dir, filename)
@@ -150,6 +153,48 @@ class NonInformativeTests(unittest.TestCase):
         recipe = self.make_recipe({}, 'test', {
             'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__)})
         self.assertRaises(zc.buildout.UserError, lambda:recipe.run('this-command-does-not-exist'))
+
+
+    def test_call_script__bbb_for_callable_with_two_parameters(self):
+        recipe = self.make_recipe({}, 'test', {
+            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
+            })
+
+        # The hook script does not return anything so we (ab)use exceptions
+        # as a mechanism for asserting the function behaviour.
+        filename = os.path.join(self.dir, 'hooks.py')
+        script = open(filename, 'w')
+        script.write('def my_hook(options, buildout): raise ValueError("I got called")\n')
+        script.close()
+
+        try:
+            recipe.call_script('%s:my_hook' % filename)
+            self.fail("The hook script was not called.")
+        except ValueError, e:
+            self.assertEquals(str(e), 'I got called')
+
+    def test_call_script__augmented_environment_as_third_parameter(self):
+        os.environ['HRC_SENTINEL'] = 'sentinel'
+        os.environ['HRC_TESTVAR'] = 'foo'
+
+        recipe = self.make_recipe({}, 'test', {
+            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
+            'environment' : 'HRC_TESTVAR=bar'
+            })
+
+        # The hook script does not return anything so we (ab)use exceptions
+        # as a mechanism for asserting the function behaviour.
+        filename = os.path.join(self.dir, 'hooks.py')
+        script = open(filename, 'w')
+        script.write('def my_hook(options, buildout, env): raise ValueError("%(HRC_SENTINEL)s %(HRC_TESTVAR)s" % env)\n')
+        script.close()
+
+        try:
+            recipe.call_script('%s:my_hook' % filename)
+            self.fail("The hook script was not called.")
+        except ValueError, e:
+            self.assertEquals(str(e), 'sentinel bar')
+
 
 def test_suite():
     suite = unittest.TestSuite((
