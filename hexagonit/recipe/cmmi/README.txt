@@ -2,6 +2,7 @@ Supported options
 =================
 
 ``url``
+
     URL to the package that will be downloaded and extracted. The
     supported package formats are .tar.gz, .tar.bz2, and .zip. The
     value must be a full URL,
@@ -9,12 +10,14 @@ Supported options
     ``path`` option can not be used at the same time with ``url``.
 
 ``path``
+
     Path to a local directory containing the source code to be built
     and installed. The directory must contain the ``configure``
     script. The ``url`` option can not be used at the same time with
     ``path``.
 
 ``prefix``
+
     Custom installation prefix passed to the ``--prefix`` option of the
     ``configure`` script. Defaults to the location of the part. Note that this
     is a convenience shortcut which assumes that the default ``configure``
@@ -24,28 +27,33 @@ Supported options
     parameter explicitly in ``configure-options``.
 
 ``md5sum``
+
     MD5 checksum for the package file. If available the MD5
     checksum of the downloaded package will be compared to this value
     and if the values do not match the execution of the recipe will
     fail.
 
 ``make-binary``
+
     Path to the ``make`` program. Defaults to 'make' which
     should work on any system that has the ``make`` program available
     in the system ``PATH``.
 
 ``make-options``
+
     Extra ``KEY=VALUE`` options included in the invocation of the ``make``
     program. Multiple options can be given on separate lines to increase
     readability.
 
 ``make-targets``
+
     Targets for the ``make`` command. Defaults to 'install'
     which will be enough to install most software packages. You only
     need to use this if you want to build alternate targets. Each
     target must be given on a separate line.
 
 ``configure-command``
+
     Name of the configure command that will be run to generate the Makefile.
     This defaults to ``./configure`` which is fine for packages that come with
     a configure script. You may wish to change this when compiling packages
@@ -53,25 +61,30 @@ Supported options
     an example.
 
 ``configure-options``
+
     Extra options to be given to the ``configure`` script. By default
     only the ``--prefix`` option is passed which is set to the part
     directory. Each option must be given on a separate line.
 
 ``patch-binary``
+
     Path to the ``patch`` program. Defaults to 'patch' which should
     work on any system that has the ``patch`` program available in the
     system ``PATH``.
 
 ``patch-options``
+
     Options passed to the ``patch`` program. Defaults to ``-p0``.
 
 ``patches``
+
     List of patch files to the applied to the extracted source. Each
     file should be given on a separate line.
 
 .. _Python hook scripts:
 
 ``pre-configure-hook``
+
     Custom python script that will be executed before running the
     ``configure`` script. The format of the options is::
 
@@ -97,16 +110,19 @@ Supported options
               directly.
 
 ``pre-make-hook``
+
     Custom python script that will be executed before running
     ``make``. The format and semantics are the same as with the
     ``pre-configure-hook`` option.
 
 ``post-make-hook``
+
     Custom python script that will be executed after running
     ``make``. The format and semantics are the same as with the
     ``pre-configure-hook`` option.
 
 ``keep-compile-dir``
+
     Switch to optionally keep the temporary directory where the
     package was compiled. This is mostly useful for other recipes that
     use this recipe to compile a software but wish to do some
@@ -232,6 +248,8 @@ a custom location within the buildout::
     foobar: Extracting package to /sample_buildout/parts/foobar__compile__
     building package
     installing package
+
+.. _Installing a package without an autoconf like system:
 
 Installing a package without an ``autoconf`` like system
 ========================================================
