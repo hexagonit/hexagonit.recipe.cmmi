@@ -70,7 +70,7 @@ class Recipe(object):
 
         See http://pypi.python.org/pypi/z3c.recipe.runscript for details.
         """
-        filename, callable = script.split(':')
+        filename, callable = script.rsplit(':', 1)
         filename = os.path.abspath(filename)
         module = imp.load_source('script', filename)
         script = getattr(module, callable.strip())
