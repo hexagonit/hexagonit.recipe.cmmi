@@ -116,7 +116,7 @@ class Recipe(object):
             configure_cmd = './configure'
             # Inject the --prefix parameter if not already present
             if '--prefix' not in ' '.join(configure_options):
-                configure_options.insert(0, '--prefix=%s' % self.options['prefix'])
+                configure_options.insert(0, '--prefix=\"%s\"' % self.options['prefix'])
 
         patch_cmd = self.options.get('patch-binary', 'patch').strip()
         patch_options = ' '.join(self.options.get('patch-options', '-p0').split())
