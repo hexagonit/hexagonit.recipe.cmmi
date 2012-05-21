@@ -1,7 +1,7 @@
 Change History
 **************
 
-1.5.1 (xxxx-xx-xx)
+1.5.1 (2012-05-21)
 ==================
 
   - PEP8 / Pyflakes cleanup.
