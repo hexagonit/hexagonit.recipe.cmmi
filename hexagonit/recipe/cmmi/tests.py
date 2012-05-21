@@ -13,14 +13,16 @@ import zc.buildout
 import zc.buildout.testing
 import zc.buildout.tests
 
-optionflags =  (doctest.ELLIPSIS |
-                doctest.NORMALIZE_WHITESPACE |
-                doctest.REPORT_ONLY_FIRST_FAILURE)
+optionflags = (doctest.ELLIPSIS |
+               doctest.NORMALIZE_WHITESPACE |
+               doctest.REPORT_ONLY_FIRST_FAILURE)
+
 
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
     zc.buildout.testing.install('hexagonit.recipe.download', test)
     zc.buildout.testing.install_develop('hexagonit.recipe.cmmi', test)
+
 
 class NonInformativeTests(unittest.TestCase):
 
@@ -33,7 +35,7 @@ class NonInformativeTests(unittest.TestCase):
             if var.startswith('HRC_'):
                 del os.environ[var]
 
-    def write_file(self, filename, contents, mode=stat.S_IREAD|stat.S_IWUSR):
+    def write_file(self, filename, contents, mode=stat.S_IREAD | stat.S_IWUSR):
         path = os.path.join(self.dir, filename)
         fh = open(path, 'w')
         fh.write(contents)
@@ -50,9 +52,9 @@ class NonInformativeTests(unittest.TestCase):
             if e.errno != errno.EEXIST:
                 raise
         bo = {
-            'buildout' : {
-                'parts-directory' : parts_directory_path,
-                'directory' : self.dir,
+            'buildout': {
+                'parts-directory': parts_directory_path,
+                'directory': self.dir,
             }
         }
         bo.update(buildout)
@@ -61,7 +63,7 @@ class NonInformativeTests(unittest.TestCase):
     def test_working_directory_restored_after_failure(self):
         compile_directory = os.path.join(self.dir, 'compile_directory')
         os.makedirs(compile_directory)
-        recipe = self.make_recipe({}, 'test', {'path' : compile_directory})
+        recipe = self.make_recipe({}, 'test', {'path': compile_directory})
         os.chdir(self.dir)
 
         self.assertRaises(zc.buildout.UserError, recipe.install)
@@ -72,7 +74,7 @@ class NonInformativeTests(unittest.TestCase):
         os.makedirs(compile_directory)
         self.write_file(os.path.join(compile_directory, 'configure'), 'Dummy configure')
 
-        recipe = self.make_recipe({}, 'test', {'path' : compile_directory})
+        self.make_recipe({}, 'test', {'path': compile_directory})
         os.chdir(self.dir)
         self.assertEquals(self.dir, os.getcwd())
 
@@ -107,7 +109,7 @@ class NonInformativeTests(unittest.TestCase):
         tar.add('Makefile')
         tar.close()
 
-        recipe = self.make_recipe({}, 'test', {'url' : tarfile_path})
+        recipe = self.make_recipe({}, 'test', {'url': tarfile_path})
         os.chdir(self.dir)
 
         try:
@@ -137,8 +139,8 @@ class NonInformativeTests(unittest.TestCase):
         self.assertEquals(os.environ.get('HRC_SENTINEL'), 'sentinel')
 
         recipe = self.make_recipe({}, 'test', {
-            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
-            'environment' : 'HRC_FOO=bar\nHRC_BAR=foo'})
+            'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
+            'environment': 'HRC_FOO=bar\nHRC_BAR=foo'})
         os.chdir(self.dir)
         recipe.install()
 
@@ -151,13 +153,12 @@ class NonInformativeTests(unittest.TestCase):
 
     def test_run__unknown_command(self):
         recipe = self.make_recipe({}, 'test', {
-            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__)})
-        self.assertRaises(zc.buildout.UserError, lambda:recipe.run('this-command-does-not-exist'))
-
+            'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__)})
+        self.assertRaises(zc.buildout.UserError, lambda: recipe.run('this-command-does-not-exist'))
 
     def test_call_script__bbb_for_callable_with_two_parameters(self):
         recipe = self.make_recipe({}, 'test', {
-            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
+            'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
             })
 
         # The hook script does not return anything so we (ab)use exceptions
@@ -178,8 +179,8 @@ class NonInformativeTests(unittest.TestCase):
         os.environ['HRC_TESTVAR'] = 'foo'
 
         recipe = self.make_recipe({}, 'test', {
-            'url' : 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
-            'environment' : 'HRC_TESTVAR=bar'
+            'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
+            'environment': 'HRC_TESTVAR=bar'
             })
 
         # The hook script does not return anything so we (ab)use exceptions

@@ -1,11 +1,12 @@
-import hexagonit.recipe.download
 import errno
+import hexagonit.recipe.download
 import imp
 import logging
 import os
 import shutil
 import subprocess
 import zc.buildout
+
 
 class Recipe(object):
     """zc.buildout recipe for compiling and installing software"""
@@ -82,7 +83,6 @@ class Recipe(object):
             # the third parameter
             script(self.options, self.buildout)
 
-
     def run(self, cmd):
         """Run the given ``cmd`` in a child process."""
         log = logging.getLogger(self.name)
@@ -99,7 +99,6 @@ class Recipe(object):
             log.error('Command failed: %s: %s' % (e, cmd))
             raise zc.buildout.UserError('System error')
 
-
     def install(self):
         log = logging.getLogger(self.name)
         parts = []
@@ -108,7 +107,7 @@ class Recipe(object):
         make_options = ' '.join(self.options.get('make-options', '').split())
         make_targets = ' '.join(self.options.get('make-targets', 'install').split())
 
-        configure_options = self.options.get('configure-options','').split()
+        configure_options = self.options.get('configure-options', '').split()
         configure_cmd = self.options.get('configure-command', '').strip()
 
         if not configure_cmd:
