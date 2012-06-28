@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.5.1'
+version = '1.6'
 name = 'hexagonit.recipe.cmmi'
 
 
@@ -28,7 +28,7 @@ setup(name=name,
       classifiers=[
        'Framework :: Buildout',
        'Intended Audience :: Developers',
-       'License :: OSI Approved :: GNU General Public License (GPL)',
+       'License :: OSI Approved :: BSD License',
        'Topic :: Software Development :: Build Tools',
        'Topic :: Software Development :: Libraries :: Python Modules',
         ],
@@ -36,7 +36,7 @@ setup(name=name,
       author='Kai Lautaportti',
       author_email='kai.lautaportti@hexagonit.fi',
       url='http://github.com/hexagonit/hexagonit.recipe.cmmi',
-      license='GPL',
+      license='BSD',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['hexagonit', 'hexagonit.recipe'],
       include_package_data=True,

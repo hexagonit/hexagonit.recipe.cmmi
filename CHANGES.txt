@@ -1,6 +1,12 @@
 Change History
 **************
 
+1.6 (2012-06-28)
+================
+
+  - Relicensed under the `3-clause BSD license <http://en.wikipedia.org/wiki/BSD_licenses#3-clause_license_.28.22New_BSD_License.22_or_.22Modified_BSD_License.22.29>`_.
+    [dokai]
+
 1.5.1 (2012-05-21)
 ==================
 
