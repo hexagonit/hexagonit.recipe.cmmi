@@ -116,10 +116,6 @@ class NonInformativeTests(unittest.TestCase):
             # expected failure
             self.assertRaises(zc.buildout.UserError, recipe.install)
 
-            # User deletes the __compile__ path
-            build_directory = os.path.join(self.dir, 'test_parts/test__compile__')
-            shutil.rmtree(build_directory)
-
             # the install should still fail, and _not_ raise an OSError
             self.assertRaises(zc.buildout.UserError, recipe.install)
         finally:
