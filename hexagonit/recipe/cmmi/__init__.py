@@ -128,14 +128,11 @@ class Recipe(object):
         # Download the source using hexagonit.recipe.download
         if self.options['url']:
             compile_dir = self.options['compile-directory']
-            try:
-                os.mkdir(compile_dir)
-            except OSError, e:
-                # leftovers from a previous failed attempt,
-                # download recipe will raise a clean error message
-                if e.errno != errno.EEXIST:
-                    raise
-
+            if os.path.exists(compile_dir):
+                # leftovers from a previous failed attempt, removing it.
+                log.warning('Removing already existing directory %s' % compile_dir)
+                shutil.rmtree(compile_dir)
+            os.mkdir(compile_dir)
             try:
                 opt = self.options.copy()
                 opt['destination'] = compile_dir
