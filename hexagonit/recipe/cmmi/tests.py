@@ -48,7 +48,7 @@ class NonInformativeTests(unittest.TestCase):
         parts_directory_path = os.path.join(self.dir, 'test_parts')
         try:
             os.mkdir(parts_directory_path)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
         bo = {
@@ -167,7 +167,7 @@ class NonInformativeTests(unittest.TestCase):
         try:
             recipe.call_script('%s:my_hook' % filename)
             self.fail("The hook script was not called.")
-        except ValueError, e:
+        except ValueError as e:
             self.assertEquals(str(e), 'I got called')
 
     def test_call_script__augmented_environment_as_third_parameter(self):
@@ -189,7 +189,7 @@ class NonInformativeTests(unittest.TestCase):
         try:
             recipe.call_script('%s:my_hook' % filename)
             self.fail("The hook script was not called.")
-        except ValueError, e:
+        except ValueError as e:
             self.assertEquals(str(e), 'sentinel bar')
 
 
