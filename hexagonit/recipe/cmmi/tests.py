@@ -7,10 +7,14 @@ import shutil
 import stat
 import tarfile
 import tempfile
-import unittest
 import zc.buildout
 import zc.buildout.testing
 import zc.buildout.tests
+
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 optionflags = (doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE |
@@ -65,8 +69,9 @@ class NonInformativeTests(unittest.TestCase):
         recipe = self.make_recipe({}, 'test', {'path': compile_directory})
         os.chdir(self.dir)
 
-        self.assertRaises(zc.buildout.UserError, recipe.install)
-        self.assertEquals(self.dir, os.getcwd())
+        with self.assertRaises(zc.buildout.UserError):
+            recipe.install()
+        self.assertEqual(self.dir, os.getcwd())
 
     def test_working_directory_restored_after_success(self):
         compile_directory = os.path.join(self.dir, 'compile_directory')
@@ -75,7 +80,7 @@ class NonInformativeTests(unittest.TestCase):
 
         self.make_recipe({}, 'test', {'path': compile_directory})
         os.chdir(self.dir)
-        self.assertEquals(self.dir, os.getcwd())
+        self.assertEqual(self.dir, os.getcwd())
 
     def test_compile_directory_exists(self):
         """
@@ -90,7 +95,8 @@ class NonInformativeTests(unittest.TestCase):
         # if compile directory exists, recipe should raise an IOError because
         # of the bad URL, and _not_ some OSError because test__compile__
         # already exists
-        self.assertRaises(IOError, recipe.install)
+        with self.assertRaises(IOError):
+            recipe.install()
 
     def test_restart_after_failure(self):
         temp_directory = tempfile.mkdtemp(dir=self.dir, prefix="fake_package")
@@ -113,10 +119,12 @@ class NonInformativeTests(unittest.TestCase):
 
         try:
             # expected failure
-            self.assertRaises(zc.buildout.UserError, recipe.install)
+            with self.assertRaises(zc.buildout.UserError):
+                recipe.install()
 
             # the install should still fail, and _not_ raise an OSError
-            self.assertRaises(zc.buildout.UserError, recipe.install)
+            with self.assertRaises(zc.buildout.UserError):
+                recipe.install()
         finally:
             try:
                 shutil.rmtree(temp_directory)
@@ -131,7 +139,7 @@ class NonInformativeTests(unittest.TestCase):
         # Place a sentinel value to make sure the original environment is
         # maintained
         os.environ['HRC_SENTINEL'] = 'sentinel'
-        self.assertEquals(os.environ.get('HRC_SENTINEL'), 'sentinel')
+        self.assertEqual(os.environ.get('HRC_SENTINEL'), 'sentinel')
 
         recipe = self.make_recipe({}, 'test', {
             'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
@@ -144,12 +152,13 @@ class NonInformativeTests(unittest.TestCase):
         self.failIf('HRC_FOO' in os.environ)
         self.failIf('HRC_BAR' in os.environ)
         # Make sure the sentinel value is still in the environment
-        self.assertEquals(os.environ.get('HRC_SENTINEL'), 'sentinel')
+        self.assertEqual(os.environ.get('HRC_SENTINEL'), 'sentinel')
 
     def test_run__unknown_command(self):
         recipe = self.make_recipe({}, 'test', {
             'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__)})
-        self.assertRaises(zc.buildout.UserError, lambda: recipe.run('this-command-does-not-exist'))
+        with self.assertRaises(zc.buildout.UserError):
+            recipe.run('this-command-does-not-exist')
 
     def test_call_script__bbb_for_callable_with_two_parameters(self):
         recipe = self.make_recipe({}, 'test', {
@@ -167,7 +176,7 @@ class NonInformativeTests(unittest.TestCase):
             recipe.call_script('%s:my_hook' % filename)
             self.fail("The hook script was not called.")
         except ValueError as e:
-            self.assertEquals(str(e), 'I got called')
+            self.assertEqual(str(e), 'I got called')
 
     def test_call_script__augmented_environment_as_third_parameter(self):
         os.environ['HRC_SENTINEL'] = 'sentinel'
@@ -189,7 +198,7 @@ class NonInformativeTests(unittest.TestCase):
             recipe.call_script('%s:my_hook' % filename)
             self.fail("The hook script was not called.")
         except ValueError as e:
-            self.assertEquals(str(e), 'sentinel bar')
+            self.assertEqual(str(e), 'sentinel bar')
 
 
 def test_suite():
