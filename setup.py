@@ -14,7 +14,7 @@ setup(
     version=version,
     description="zc.buildout recipe for compiling and installing source distributions.",
     long_description=(
-        read('README.txt')
+        read('README.rst')
         + '\n' +
         read('CHANGES.txt')
         + '\n' +
