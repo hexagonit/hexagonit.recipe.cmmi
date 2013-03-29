@@ -484,3 +484,14 @@ You can then continue from where this recipe finished by reading the location
 of the compile directory from ``options['compile-directory']`` from your own
 recipe.
 
+
+Contributors
+************
+
+* Kai Lautaportti (dokai), Author
+* Cédric de Saint Martin (desaintmartin)
+* Marc Abramowitz (msabramo)
+* Nicolas Dumazet (nicdumz)
+* Guy Rozendorn (grzn)
+* Marco Mariani (mmariani)
+* galpin
