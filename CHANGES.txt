@@ -1,11 +1,29 @@
 Change History
 **************
 
+2.0 (xxxx-xx-xx)
+================
+
+  - Dropped support for Python 2.4/2.5. Use the 1.x versions for those.
+    Currently supported versions are Python 2.6, 2.7, 3.2 and 3.3. [dokai]
+
+  - Python 3.2/3.3 support. [dokai, mmariani]
+
+  - Tox support. [msabramo]
+
+  - Travis CI integration. https://travis-ci.org/hexagonit/hexagonit.recipe.cmmi
+    [msabramo]
+
+  - Automatically clean up a left-over compile directory from a previously
+    failed run. [desaintmartin]
+
+
 1.6 (2012-06-28)
 ================
 
   - Relicensed under the `3-clause BSD license <http://en.wikipedia.org/wiki/BSD_licenses#3-clause_license_.28.22New_BSD_License.22_or_.22Modified_BSD_License.22.29>`_.
     [dokai]
+
 
 1.5.1 (2012-05-21)
 ==================
@@ -20,6 +38,7 @@ Change History
   - Fixed importing of the hook scripts on Windows. Closes
     https://github.com/hexagonit/hexagonit.recipe.cmmi/pull/6
     [grzn]
+
 
 1.5.0 (2010-12-17)
 ==================
@@ -44,6 +63,7 @@ Change History
 
     See https://github.com/hexagonit/hexagonit.recipe.cmmi/issues/issue/1/#issue/1/comment/605362
     for details.
+
 
 1.4.0 (2010-08-27)
 ==================
@@ -75,6 +95,7 @@ Change History
     configuration to assert that you are downloading the package you expect
     to. [dokai]
 
+
 1.3.1 (2010-08-23)
 ==================
 
@@ -90,6 +111,7 @@ Change History
    Environment variables defined in one part will no longer leak to other
    subsequent parts. [dokai]
 
+
 1.3.0 (2009-09-20)
 ==================
 
@@ -99,6 +121,7 @@ Change History
   - Added a new option, ``prefix``, to override the installation prefix.
     Defaults to the previously hardcoded value of the part location.
 
+
 1.2.0
 =====
 
@@ -107,12 +130,14 @@ Change History
     different packages, e.g. Perl projects where Makefile.PL replaces the
     configure script.
 
+
 1.1.1
 =====
 
   - Don't try to execute hooks if the option is an empty string. This
     will make it possible to disable hooks when extending existing
     parts.
+
 
 1.1.0
 =====
@@ -121,12 +146,14 @@ Change History
    source trees. The ``path`` option is mutually exclusive with
    ``url``.
 
+
 1.0.1
 =====
 
  - Fixed a bug with 'keep-compile-dir' option. The location of the
    compilation directory was not available through the
    ``options['compile-directory']`` option as documented.
+
 
 1.0.0
 =====
