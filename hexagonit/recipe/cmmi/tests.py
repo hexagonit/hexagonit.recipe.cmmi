@@ -155,7 +155,7 @@ class NonInformativeTests(unittest.TestCase):
     def test_call_script__bbb_for_callable_with_two_parameters(self):
         recipe = self.make_recipe({}, 'test', {
             'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
-            })
+        })
 
         # The hook script does not return anything so we (ab)use exceptions
         # as a mechanism for asserting the function behaviour.
@@ -177,7 +177,7 @@ class NonInformativeTests(unittest.TestCase):
         recipe = self.make_recipe({}, 'test', {
             'url': 'file://%s/testdata/package-0.0.0.tar.gz' % os.path.dirname(__file__),
             'environment': 'HRC_TESTVAR=bar'
-            })
+        })
 
         # The hook script does not return anything so we (ab)use exceptions
         # as a mechanism for asserting the function behaviour.
@@ -195,21 +195,21 @@ class NonInformativeTests(unittest.TestCase):
 
 def test_suite():
     suite = unittest.TestSuite((
-            doctest.DocFileSuite(
-                'README.txt',
-                setUp=setUp,
-                tearDown=zc.buildout.testing.buildoutTearDown,
-                optionflags=optionflags,
-                checker=renormalizing.RENormalizing([
-                        (re.compile('--prefix=\S+sample-buildout'),
-                         '--prefix=/sample_buildout'),
-                        (re.compile('\s/\S+sample-buildout'),
-                         ' /sample_buildout'),
-                        zc.buildout.testing.normalize_path,
-                        ]),
-                ),
-            unittest.makeSuite(NonInformativeTests),
-            ))
+        doctest.DocFileSuite(
+            'README.txt',
+            setUp=setUp,
+            tearDown=zc.buildout.testing.buildoutTearDown,
+            optionflags=optionflags,
+            checker=renormalizing.RENormalizing([
+                (re.compile('--prefix=\S+sample-buildout'),
+                 '--prefix=/sample_buildout'),
+                (re.compile('\s/\S+sample-buildout'),
+                 ' /sample_buildout'),
+                zc.buildout.testing.normalize_path,
+            ]),
+        ),
+        unittest.makeSuite(NonInformativeTests),
+    ))
     return suite
 
 if __name__ == '__main__':
