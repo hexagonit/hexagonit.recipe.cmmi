@@ -95,7 +95,7 @@ class Recipe(object):
             elif retcode > 0:
                 log.error('Command failed with exit code %s: %s' % (retcode, cmd))
                 raise zc.buildout.UserError('System error')
-        except OSError, e:
+        except OSError as e:
             log.error('Command failed: %s: %s' % (e, cmd))
             raise zc.buildout.UserError('System error')
 
@@ -148,7 +148,7 @@ class Recipe(object):
         current_dir = os.getcwd()
         try:
             os.mkdir(self.options['location'])
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.EEXIST:
                 pass
         os.chdir(compile_dir)

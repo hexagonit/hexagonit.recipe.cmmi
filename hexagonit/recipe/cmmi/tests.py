@@ -1,6 +1,5 @@
-from zope.testing import doctest
 from zope.testing import renormalizing
-
+import doctest
 import errno
 import os
 import re
@@ -31,7 +30,7 @@ class NonInformativeTests(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.dir)
-        for var in os.environ.keys():
+        for var in list(os.environ.keys()):
             if var.startswith('HRC_'):
                 del os.environ[var]
 
@@ -48,7 +47,7 @@ class NonInformativeTests(unittest.TestCase):
         parts_directory_path = os.path.join(self.dir, 'test_parts')
         try:
             os.mkdir(parts_directory_path)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
         bo = {
@@ -167,7 +166,7 @@ class NonInformativeTests(unittest.TestCase):
         try:
             recipe.call_script('%s:my_hook' % filename)
             self.fail("The hook script was not called.")
-        except ValueError, e:
+        except ValueError as e:
             self.assertEquals(str(e), 'I got called')
 
     def test_call_script__augmented_environment_as_third_parameter(self):
@@ -189,7 +188,7 @@ class NonInformativeTests(unittest.TestCase):
         try:
             recipe.call_script('%s:my_hook' % filename)
             self.fail("The hook script was not called.")
-        except ValueError, e:
+        except ValueError as e:
             self.assertEquals(str(e), 'sentinel bar')
 
 
@@ -211,6 +210,3 @@ def test_suite():
         unittest.makeSuite(NonInformativeTests),
     ))
     return suite
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')

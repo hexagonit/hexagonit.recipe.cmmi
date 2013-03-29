@@ -208,7 +208,7 @@ Let's create a buildout to build and install the package.
 This will download, extract and build our demo package with the
 default build options.
 
-    >>> print system(buildout)
+    >>> print(system(buildout))
     Installing package.
     package: Extracting package to /sample_buildout/parts/package__compile__
     configure --prefix=/sample_buildout/parts/package
@@ -242,7 +242,7 @@ a custom location within the buildout::
     ... url = file://%s/Foo-Bar-0.0.0.tar.gz
     ... """ % src)
 
-    >>> print system(buildout)
+    >>> print(system(buildout))
     Uninstalling package.
     Installing foobar.
     foobar: Extracting package to /sample_buildout/parts/foobar__compile__
@@ -281,7 +281,7 @@ Makefile and using explicit ``make`` options to control the build process.
     ... url = file://%s/haproxy-1.4.8-dummy.tar.gz
     ... """ % src)
 
-    >>> print system(buildout)
+    >>> print(system(buildout))
     Uninstalling foobar.
     Installing haproxy.
     haproxy: Extracting package to /sample_buildout/parts/haproxy__compile__
@@ -322,7 +322,7 @@ and building that.
     ... path = %s/package-0.0.0
     ... """ % checkout_dir)
 
-    >>> print system(buildout)
+    >>> print(system(buildout))
     Uninstalling haproxy.
     Installing package.
     package: Using local source directory: /checkout/package-0.0.0
@@ -379,7 +379,7 @@ This configuration uses custom configure options, an environment section,
 per-part customization to the environment, custom prefix, multiple make
 targets and also patches the source code before the scripts are run.
 
-    >>> print system(buildout)
+    >>> print(system(buildout))
     Uninstalling package.
     Installing package.
     package: [ENV] CFLAGS = -I/sw/include
@@ -464,7 +464,7 @@ and a new buildout to try it out
     ... post-make-hook = %(module)s:postmake
     ... """ % dict(src=src, module='%s/customhandlers.py' % hooks))
 
-    >>> print system(buildout)
+    >>> print(system(buildout))
     Uninstalling package.
     Installing package.
     package: Extracting package to /sample_buildout/parts/package__compile__
