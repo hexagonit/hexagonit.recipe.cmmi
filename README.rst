@@ -14,6 +14,10 @@ Clone URL: git clone git://github.com/hexagonit/hexagonit.recipe.cmmi.git
 
 Issue tracker: http://github.com/hexagonit/hexagonit.recipe.cmmi/issues
 
+Supported Python versions: 2.6, 2.7, 3.2, 3.3
+
+Supported zc.buildout versions: 1.x, 2.x
+
 Travis build: |travis|
 
 .. |travis| image:: https://api.travis-ci.org/hexagonit/hexagonit.recipe.cmmi.png

@@ -27,9 +27,14 @@ setup(
         '***********************\n'
     ),
     classifiers=[
+        'Framework :: Buildout :: Recipe',
         'Framework :: Buildout',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Software Development :: Build Tools',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
