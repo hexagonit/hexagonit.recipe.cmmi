@@ -14,4 +14,8 @@ Clone URL: git clone git://github.com/hexagonit/hexagonit.recipe.cmmi.git
 
 Issue tracker: http://github.com/hexagonit/hexagonit.recipe.cmmi/issues
 
+Travis build: |travis|
+
+.. |travis| image:: https://api.travis-ci.org/hexagonit/hexagonit.recipe.cmmi.png
+
 .. _zc.recipe.cmmi : http://pypi.python.org/pypi/zc.recipe.cmmi
