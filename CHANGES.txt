@@ -1,7 +1,7 @@
 Change History
 **************
 
-2.0 (xxxx-xx-xx)
+2.0 (2013-04-07)
 ================
 
   - Dropped support for Python 2.4/2.5. Use the 1.x versions for those.
@@ -9,13 +9,17 @@ Change History
 
   - Python 3.2/3.3 support. [dokai, mmariani]
 
-  - Tox support. [msabramo]
+  - Tox support.
+    https://github.com/hexagonit/hexagonit.recipe.cmmi/pull/7
+    [msabramo]
 
   - Travis CI integration. https://travis-ci.org/hexagonit/hexagonit.recipe.cmmi
+    See https://github.com/hexagonit/hexagonit.recipe.cmmi/pull/7
     [msabramo]
 
   - Automatically clean up a left-over compile directory from a previously
-    failed run. [desaintmartin]
+    failed run. See https://github.com/hexagonit/hexagonit.recipe.cmmi/pull/9
+    [desaintmartin]
 
 
 1.6 (2012-06-28)
